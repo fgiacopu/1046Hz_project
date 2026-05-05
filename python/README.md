@@ -25,6 +25,26 @@ The module is designed as a standalone and stable data source, decoupled from so
 - Continuous hand openness descriptor
 - Stable execution at interactive frame rates on Windows
 
+### Environment Setup (Conda/Python)
+The Python subsystem is designed to run inside a dedicated Conda environment to ensure dependency consistency and reproducibility.
+An environment description is provided in the form of a .yml file.
+
+#### Create the Conda Environment
+To create the environment from the provided YAML file:
+`conda env create -f environment.yml`
+
+#### Activate the Environment
+`conda activate envname`
+
+Replace `envname` with the actual environment name specified in the YAML file, default is `cmls`.
+
+#### Run the Application
+Once the environment is activated, navigate to the Python module directory and run:
+
+`python main.py`
+
+If the setup is correct, a webcam window with hand landmarks should appear and OSC messages will be transmitted in real time.
+
 ### OSC Interface
 The Python module exposes a fixed OSC control interface.
 #### OSC Addresses
