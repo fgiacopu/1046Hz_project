@@ -1,3 +1,10 @@
 # Python cache
 __pycache__/
 *.pyc
+
+
+# Local SuperCollider files
+supercollider/
+
+# Local JUCE files
+juce/
