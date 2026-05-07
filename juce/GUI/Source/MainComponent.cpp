@@ -80,7 +80,7 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
         if (message.size() > 0 && message[0].isFloat32())
         {
             float val = message[0].getFloat32();
-            sender.send("/juce/volume", val);
+            sender.send("/hand/left/open", val);
             // Update UI knob safely on the main Thread
             juce::MessageManager::callAsync([this, val]() {
                 handKnob.setValue(val, juce::dontSendNotification); //preventing the app from crashing when network data tries to move a UI knob
