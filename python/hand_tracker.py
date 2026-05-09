@@ -2,6 +2,7 @@
 
 import time
 import cv2
+import tkinter as tk
 import mediapipe as mp
 from config import CAMERA_INDEX, MAX_HANDS, MIN_DET_CONF, MIN_TRACK_CONF
 
@@ -13,9 +14,14 @@ class HandTracker:
         if not self.cap.isOpened():
             raise RuntimeError(f"Impossibile aprire la webcam {CAMERA_INDEX}")
 
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         time.sleep(0.3)  # warm-up webcam
+
+        self.window_name = "Hand Tracker"
+        cv2.namedWindow(self.window_name, cv2.WINDOW_AUTOSIZE)
+        self.window_positioned = False
+        self.display_size = 320  # size of the longer side
 
         # MediaPipe
         self.mp_hands = mp.solutions.hands
@@ -59,9 +65,41 @@ class HandTracker:
 
         return frame, hands_data
 
+    def position_window(self):
+        root = tk.Tk()
+        root.withdraw()
+
+        screen_w = root.winfo_screenwidth()
+        screen_h = root.winfo_screenheight()
+
+        root.destroy()
+
+        margin = 20
+        x = max(0, screen_w - self.display_w - margin)
+        y = margin
+
+        cv2.moveWindow(self.window_name, x, y)
+
+    SHOW_CAMERA = True  # or False
+
     def show(self, frame):
-        if frame is not None and frame.size > 0:
-            cv2.imshow("Hand Tracker", frame)
+        if not self.SHOW_CAMERA or frame is None or frame.size == 0:
+            return
+
+        h, w, _ = frame.shape
+
+        scale = self.display_size / max(w, h)
+
+        self.display_w = int(w * scale)
+        self.display_h = int(h * scale)
+
+        display = cv2.resize(frame, (self.display_w, self.display_h))
+
+        cv2.imshow(self.window_name, display)
+
+        if not self.window_positioned:
+            self.position_window()
+            self.window_positioned = True
 
     def should_quit(self):
         return cv2.waitKey(1) & 0xFF == ord('q')
