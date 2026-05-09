@@ -25,11 +25,38 @@ Overall, the system is designed to support real-time responsiveness, modular dev
 - Optional: Arduino (physiological sensing extension)
 
 ## Development Status
-This repository currently contains an early skeleton of the project.
-The system architecture and component responsibilities are defined, while individual modules are under active development.
+This repository contains a working prototype of the system.
+
+- Core architecture is defined.
+- Gesture tracking, OSC communication, and sound synthesis are functional.
+- System startup and component orchestration are stable.
+- Further refinements and expressive mappings are ongoing
 
 ## How to Run
-Setup instructions will be added in a later development stage.
+1. Ensure dependencies are installed:
+   - Python environment with required libraries (see `python/environment.yml`)
+   - SuperCollider
+   - JUCE application built for your system
+
+2. Launch the system: `start_system.bat`
+
+The full system is launched using a system‑level batch script to ensure a
+deterministic startup order and reliable MIDI handling on Windows.
+
+Each module of the system is designed to function independently in standalone mode:
+- The Python gesture‑tracking engine can be executed on its own for development and testing of computer‑vision algorithms.
+- The JUCE application can run standalone as a graphical control interface, even in the absence of the Python backend.
+- The SuperCollider sound engine can be launched independently for sound design, synthesis development, and MIDI testing.
+
+### Startup sequence:
+1. SuperCollider is launched first to ensure exclusive MIDI access.
+2. The JUCE application is launched.
+3. JUCE automatically starts the Python gesture‑tracking engine as a headless background process.
+
+This approach guarantees both modular standalone operation and stable integrated
+execution, favoring robustness, reproducibility, and clear separation of system
+responsibilities.
+
 
 ## Group Members
 Lorenzo Corna \
@@ -61,25 +88,17 @@ guidelines below.
     - `juce`
     - `supercollider`
 
-- Feature branches (optional)  
-    Used only for medium to large features or experiments, e.g.:
-    - `py-osc-routing`
-    - `sc-synth-engine`
-    - `juce-gui-layout`
-
 ### Keeping Your Branch Updated
 To integrate changes merged by others into development:
 ```bash
 git checkout python
-git pull origin development
+ git restore --source origin/development -- python/
 ```
 This:
-- updates your branch with the latest integrated work
-- does not change the upstream of your branch
+- updates your branch with the latest integrated work in the development
 - does not affect `main`
 
 ### Workflow
-#### Daily Development
 
 1. Switch to your section branch:
 ```bash
@@ -97,49 +116,8 @@ git commit -m "feat: clear description of the change"
 git push
 ```
 
-#### Feature Branch (optional)
-1. Create and switch to a feature branch:
-```bash
-git checkout python
-git checkout -b py-feature-name
-```
-2. Develop and commit changes:
-```bash
-git add .
-git commit -m "feat: implement feature description"
-```
-3. Push the feature branch:
-```bash
-git push -u origin py-feature-name
-```
-4. Open a Pull Request:
-
-    base: `python` compare: `py-feature-name`
-
-### Integrating Sections
-When a section is stable and locally tested, open a Pull Request:
-
-base: `development` compare: `supercollider`\
-base: `development` compare: `juce`\
-base: `development` compare: `python`
-
-All integrations must happen via Pull Request.
-
 ### Final Merge
 When the entire project works correctly in development, open a Pull Request:\
 base: `main` compare: `development`
 
 Use `Squash and merge` to keep the `main` history clean and readable.
-
-### Commit Guidelines
-
-Keep commits focused and meaningful.
-One commit should represent one logical change.
-Use clear commit messages (e.g. feat: add OSC mapping).
-Do not commit build artifacts, generated files, or temporary data.
-
-### Coordination
-
-Changes affecting shared interfaces (e.g. OSC messages, parameter names,
-data formats, or ranges) must be discussed with the team before being
-merged into `development` and later into `main`.

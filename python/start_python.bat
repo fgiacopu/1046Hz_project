@@ -1,14 +1,11 @@
 @echo off
-echo ==============================
-echo Starting Gesture Control Python
-echo ==============================
 
-cd /d "C:\Users\Federico\Documents\polimi\corsi\cmls\1046Hz_project\python"
+REM Set here the full path to your Python interpreter
+set PYTHON_EXE=C:\Users\Federico\miniconda3\envs\cmls\python.exe
 
-"C:\Users\Federico\miniconda3\envs\cmls\python.exe" main.py
+cd /d "%~dp0"
+cd python
 
-echo.
-echo ==============================
-echo Python process ended
-echo ==============================
+"%PYTHON_EXE%" main.py
+
 pause

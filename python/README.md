@@ -93,7 +93,7 @@ Reserved for future Arduino‑based sensors.
 
 ## Future Extensions
 The following features are not implemented in the current version but represent
-conceptual extensions identified during development and testing
+conceptual extensions identified during development and testing.
 
 ### Thumb‑based Articulation Trigger
 The thumb can be processed independently from hand openness to act as a discrete

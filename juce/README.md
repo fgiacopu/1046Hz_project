@@ -9,7 +9,7 @@ parameters, providing a graphical user interface, and optionally applying audio 
 - OSC reception from external processes
 - Parameter smoothing and routing
 - Graphical user interface
-- Plugin integration (VST/AU)
+- Automatic startup and management of the Python gesture‑tracking engine
 
 ## Status
 ### Implemented Features
@@ -19,6 +19,7 @@ parameters, providing a graphical user interface, and optionally applying audio 
 - Graphical visualization of gesture parameters using a rotary slider
 - OSC forwarding to SuperCollider sound engine
 - Standalone GUI application for testing and debugging
+- Automatic startup of the Python hand‑tracking process when the JUCE application is launched
 
 ## OSC Interface
 ### Input (from Python)
@@ -43,7 +44,7 @@ The JUCE module performs three main operations:
 - Ensures thread safety when interacting with UI components  
 
 ### 3. Parameter Forwarding
-- Sends processed control values via OSC to SuperCollider (`127.0.0.1:57120`)
+- Sends processed control values via OSC to SuperCollider (`127.0.0.1:57130`)
 - Enables real‑time mapping between gesture descriptors and sound synthesis parameters
 
 ## Execution
@@ -56,10 +57,11 @@ To run the application:
 2. Export the project to the chosen IDE (e.g. Visual Studio)  
 3. Build and run the application  
 
-Once running:
-- The GUI displays a rotary control representing hand openness  
-- OSC messages are received in real time from Python  
-- Processed values are forwarded to SuperCollider  
+When the JUCE application starts:
+- The Python gesture‑tracking engine is automatically launched as a headless background process
+- The GUI displays a rotary control representing hand openness
+- OSC messages are received in real time from Python
+- Processed control values are forwarded to SuperCollider
 
 ## Code Structure
 
@@ -87,11 +89,9 @@ Once running:
   - forwarding to SuperCollider
 
 ## Implementation Details
-
 The core logic is implemented inside the `MainComponent` class.
 
 ### OSC Reception
-
 The system uses `juce::OSCReceiver` to listen on port `9000`.
 
 Incoming messages are handled through:
@@ -121,6 +121,7 @@ float val = message[0].getFloat32();
 ```
 The value is assumed to be normalized in the range [0.0 – 1.0], as provided by the Python module.
 This allows direct mapping to synthesis parameters.
+
 ### GUI Initialization and Configuration
 The graphical interface is initialized in the constructor.
 A rotary slider is used to visualize the gesture value:
@@ -155,7 +156,7 @@ This is essential to avoid race conditions and crashes in real‑time applicatio
 ### OSC Forwarding
 After processing, the gesture value is sent to SuperCollider:
 ```cpp
-sender.connect("127.0.0.1", 57120);
+sender.connect("127.0.0.1", 57130);
 sender.send("/hand/left/open", val);
 ```
 This creates a direct mapping between gesture input and sound parameters.
@@ -172,5 +173,3 @@ Instead:
 
 - JUCE operates at control rate
 - SuperCollider handles audio‑rate synthesis
-
-

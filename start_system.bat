@@ -1,11 +1,9 @@
 @echo off
-
-cd /d "C:\Users\Federico\Documents\polimi\corsi\cmls\1046Hz_project\supercollider"
+set PROJECT_ROOT=%~dp0
 
 start "SuperCollider Audio Engine" ^
-"C:\Program Files\SuperCollider-3.14.1\sclang.exe" audio_engine_sclang.scd
+"C:\Program Files\SuperCollider-3.14.1\sclang.exe" "%PROJECT_ROOT%supercollider\audio_engine.scd"
 
 timeout /t 3 > nul
 
-start "" ^
-"C:\Users\Federico\Documents\polimi\corsi\cmls\1046Hz_project\juce\GUI\Builds\VisualStudio2026\x64\Debug\App\GUI.exe"
+start "" "%PROJECT_ROOT%juce\GUI\Builds\VisualStudio2026\x64\Debug\App\GUI.exe"
