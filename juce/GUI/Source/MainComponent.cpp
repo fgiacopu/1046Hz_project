@@ -33,11 +33,20 @@ MainComponent::MainComponent()
         receiver.connect(9000); //Listen to Python
         receiver.addListener(this); //This class handles the data
         sender.connect("127.0.0.1", 57130); //Forwording to SC
+
+        startPython();
     }
 }
 
 MainComponent::~MainComponent()
 {
+
+    if (pythonProcess.isRunning())
+    {
+        pythonProcess.kill();
+        pythonProcess.waitForProcessToFinish(2000);
+    }
+
     // This shuts down the audio device and clears the audio source.
     shutdownAudio();
 }
@@ -108,4 +117,18 @@ void MainComponent::resized()
     auto area = getLocalBounds();
     handKnob.setBounds(area.withSizeKeepingCentre(250, 250));
     knobLabel.setBounds(handKnob.getX(), handKnob.getBottom() - 10, handKnob.getWidth(), 25);
+}
+
+void MainComponent::startPython()
+{
+#if JUCE_WINDOWS
+	juce::String command = // change paths according to your system
+        "\"C:/Users/Federico/miniconda3/envs/cmls/python.exe\" "
+        "\"C:/Users/Federico/Documents/polimi/corsi/cmls/1046Hz_project/python/main.py\"";
+#endif
+
+    bool ok = pythonProcess.start(command);
+
+    if (!ok)
+        DBG("Failed to start Python process");
 }

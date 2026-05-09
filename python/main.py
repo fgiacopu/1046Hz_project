@@ -4,6 +4,7 @@ from hand_tracker import HandTracker
 from gesture_features import compute_hand_openness
 from smoothing import SignalSmoother
 from osc_sender import OscSender
+import time
 from config import USE_ARDUINO, OSC_IP, OSC_PORT
 
 def main():
@@ -15,7 +16,12 @@ def main():
     smooth_right = SignalSmoother(alpha=0.3)
 
     # OSC
-    osc = OscSender(ip=OSC_IP, port=OSC_PORT, debug=True) # debug=True to print OSC messages values in console
+    osc = OscSender(ip=OSC_IP, port=OSC_PORT, debug=False) # debug=True to print OSC messages values in console
+
+    # Rate limit setup
+    SEND_INTERVAL = 0.03  # ~33 Hz
+    last_send_left = 0.0
+    last_send_right = 0.0
 
     # Optional Arduino input
     arduino = None

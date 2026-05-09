@@ -35,5 +35,12 @@ private:
     juce::Slider handKnob;
     juce::Label knobLabel;
 
+    // ==== PYTHON PROCESS ====
+    juce::ChildProcess pythonProcess;
+
+    void startPython();
+    void stopPython();
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
