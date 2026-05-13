@@ -1,7 +1,7 @@
 # main.py
 
 from hand_tracker import HandTracker
-from gesture_features import compute_hand_openness
+from gesture_features import compute_hand_openness, compute_thumb_value
 from smoothing import SignalSmoother
 from osc_sender import OscSender
 import time
@@ -16,7 +16,7 @@ def main():
     smooth_right = SignalSmoother(alpha=0.3)
 
     # OSC
-    osc = OscSender(ip=OSC_IP, port=OSC_PORT, debug=False) # debug=True to print OSC messages values in console
+    osc = OscSender(ip=OSC_IP, port=OSC_PORT, debug=True, debug_filter=["thumb"]) # debug=True to print OSC messages values in console
 
     # Rate limit setup
     SEND_INTERVAL = 0.03  # ~33 Hz
@@ -45,11 +45,14 @@ def main():
                 if label == "Left":    
                     value = smooth_left.process(openness)
                     osc.send("/hand/left/open", value)
+                    thumb = compute_thumb_value(landmarks)
+                    osc.send("/hand/left/thumb", thumb)
 
                 elif label == "Right":
                     value = smooth_right.process(openness)
                     osc.send("/hand/right/open", value)
-
+                    thumb = compute_thumb_value(landmarks)
+                    osc.send("/hand/right/thumb", thumb)
             tracker.show(frame)
 
         # Optional Arduino input

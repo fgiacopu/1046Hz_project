@@ -14,6 +14,11 @@ FINGERTIP_WEIGHTS = {
 MIN_OPENNESS = 0.035
 MAX_OPENNESS = 0.185
 
+THUMB_TIP = 4
+
+MIN_THUMB_DIST = 0.02
+MAX_THUMB_DIST = 0.15
+
 def normalize(value, min_val, max_val):
     value_clamped = max(min_val, min(value, max_val))
     return (value_clamped - min_val) / (max_val - min_val)
@@ -48,6 +53,20 @@ def compute_hand_openness(landmarks):
 
     return openness
 
+def compute_thumb_value(landmarks):
+    # Palm center (riusa la stessa logica)
+    palm_x = sum(landmarks[i].x for i in PALM_POINTS) / len(PALM_POINTS)
+    palm_y = sum(landmarks[i].y for i in PALM_POINTS) / len(PALM_POINTS)
+
+    thumb = landmarks[THUMB_TIP]
+
+    # Distanza euclidea thumb → palm center
+    d = ((thumb.x - palm_x) ** 2 + (thumb.y - palm_y) ** 2) ** 0.5
+
+    # Normalizzazione
+    thumb_value = normalize(d, MIN_THUMB_DIST, MAX_THUMB_DIST)
+
+    return thumb_value
+
 # def compute_hand_vibrato()
 
-# def compute_thumb_trigger()
