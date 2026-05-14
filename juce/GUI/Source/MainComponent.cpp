@@ -122,9 +122,18 @@ void MainComponent::resized()
 void MainComponent::startPython()
 {
 #if JUCE_WINDOWS
-	juce::String command = // change paths according to your system
-        "\"C:/Users/Federico/miniconda3/envs/cmls/python.exe\" "
-        "\"C:/Users/Federico/Documents/polimi/corsi/cmls/1046Hz_project/python/main.py\"";
+	// Find the directory containing the executable, and then look for a "python" folder in that directory or its parents
+    juce::File dir = juce::File::getSpecialLocation(juce::File::currentExecutableFile);
+
+    while (dir.exists() && !dir.getChildFile("python").exists())
+        dir = dir.getParentDirectory();
+
+	// Change this to the path of your Python executable if it's not in the expected location
+    juce::String pythonExe = "\"C:/Users/Federico/miniconda3/envs/cmls/python.exe\" ";
+    juce::File script = dir.getChildFile("python/main.py");
+
+    juce::String command = pythonExe + "\"" + script.getFullPathName() + "\"";
+
 #endif
 
     bool ok = pythonProcess.start(command);
