@@ -54,16 +54,16 @@ def compute_hand_openness(landmarks):
     return openness
 
 def compute_thumb_value(landmarks):
-    # Palm center (riusa la stessa logica)
+    # Palm center
     palm_x = sum(landmarks[i].x for i in PALM_POINTS) / len(PALM_POINTS)
     palm_y = sum(landmarks[i].y for i in PALM_POINTS) / len(PALM_POINTS)
 
     thumb = landmarks[THUMB_TIP]
 
-    # Distanza euclidea thumb → palm center
+    # Distance from thumb tip to palm center
     d = ((thumb.x - palm_x) ** 2 + (thumb.y - palm_y) ** 2) ** 0.5
 
-    # Normalizzazione
+    # Normalize thumb distance to a 0-1 range based on observed min/max values
     thumb_value = normalize(d, MIN_THUMB_DIST, MAX_THUMB_DIST)
 
     return thumb_value

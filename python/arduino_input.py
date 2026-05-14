@@ -4,7 +4,7 @@ class ArduinoInput:
     def __init__(self, port="/dev/ttyACM0", baudrate=9600):
         self.port = port
         self.baudrate = baudrate
-        self.enabled = False  # disattivato di default
+        self.enabled = False  # default to False, will be set to True if connection is successful
 
     def connect(self):
         try:
