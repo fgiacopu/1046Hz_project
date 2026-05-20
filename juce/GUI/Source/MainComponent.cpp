@@ -33,20 +33,11 @@ MainComponent::MainComponent()
         receiver.connect(9000); //Listen to Python
         receiver.addListener(this); //This class handles the data
         sender.connect("127.0.0.1", 57130); //Forwording to SC
-
-        startPython();
     }
 }
 
 MainComponent::~MainComponent()
 {
-
-    if (pythonProcess.isRunning())
-    {
-        pythonProcess.kill();
-        pythonProcess.waitForProcessToFinish(2000);
-    }
-
     // This shuts down the audio device and clears the audio source.
     shutdownAudio();
 }
@@ -117,27 +108,4 @@ void MainComponent::resized()
     auto area = getLocalBounds();
     handKnob.setBounds(area.withSizeKeepingCentre(250, 250));
     knobLabel.setBounds(handKnob.getX(), handKnob.getBottom() - 10, handKnob.getWidth(), 25);
-}
-
-void MainComponent::startPython()
-{
-#if JUCE_WINDOWS
-	// Find the directory containing the executable, and then look for a "python" folder in that directory or its parents
-    juce::File dir = juce::File::getSpecialLocation(juce::File::currentExecutableFile);
-
-    while (dir.exists() && !dir.getChildFile("python").exists())
-        dir = dir.getParentDirectory();
-
-	// Change this to the path of your Python executable if it's not in the expected location
-    juce::String pythonExe = "\"C:/Users/Federico/miniconda3/envs/cmls/python.exe\" ";
-    juce::File script = dir.getChildFile("python/main.py");
-
-    juce::String command = pythonExe + "\"" + script.getFullPathName() + "\"";
-
-#endif
-
-    bool ok = pythonProcess.start(command);
-
-    if (!ok)
-        DBG("Failed to start Python process");
 }

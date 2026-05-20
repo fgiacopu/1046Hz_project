@@ -10,7 +10,7 @@ MIN_TRACK_CONF = 0.5
 
 # OSC
 OSC_IP = "127.0.0.1"
-OSC_PORT = 57130
+OSC_PORT = 9000 # 57130
 
 # Arduino (optional)
 USE_ARDUINO = False

@@ -1,152 +1,226 @@
-Server.default.options.outDevice = nil;          // Disable explicit audio output device selection
-Server.default.options.numOutputBusChannels = 2; // Force the server to allocate exactly 2 output audio channels
-Server.default.options.memSize = 8192 * 16;      // Increase server memory
+Server.default.options.outDevice = nil;
+Server.default.options.numOutputBusChannels = 2;
+Server.default.options.memSize = 8192 * 16;
 
 s.boot;
 
-s.waitForBoot({ // Execute the following block only after the server has fully booted
+s.waitForBoot({
 
-	MIDIClient.init;     // Initialize the MIDI subsystem
-	MIDIIn.connectAll;   // Connect all detected MIDI inputs automatically
+    MIDIClient.init;
+    MIDIIn.connectAll;
 
-	"SuperCollider server booted".postln;
+    "SuperCollider server booted".postln;
 
-   //	Global container for continuous gesture data received via OSC.
-   // Values are updated asynchronously and read by control routines.
+    // =========================
+    // GLOBAL STATE
+    // =========================
 
-	// Array indexed by MIDI note number, stores active Synth instances
-	~notes = Array.newClear(128);
+    ~notes = Array.newClear(128);
+    ~releasedNotes = Array.newClear(128);
+    ~sustainActive = false;
 
-	// True while sustain pedal (CC 64) is pressed
-	~sustainActive = false;
+    ~lastGestureTime = AppClock.seconds;
 
-	// Notes released during sustain, freed when pedal is lifted
-	~releasedNotes = Array.newClear(128);
+    ~gestureData = (
+        openness: 0.0,   // mano sx apertura → cutoff
+        thumb: 0.0,      // pollice sx → flanger
+        rightOpen: 0.0   // mano dx apertura → chorus
+    );
 
-	~lastGestureTime = AppClock.seconds;
+    // =========================
+    // SYNTHDEF (PAD + FLANGER + CHORUS)
+    // =========================
 
-	// Shared state for continuous gesture data received via OSC
-	~gestureData = (
-		openness: 0.0
-	);
+    SynthDef(\fatPad, {
+        |freq = 440, amp = 0.3, gate = 1,
+         cutoff = 1000, rq = 0.5,
 
-   // Pad-like synthesizer based on detuned saw oscillators,
-   // low-pass filtering and slow modulation for movement.
+         // FLANGER
+         flangerMix = 0.0, flangerDepth = 0.5, flangerRate = 0.2,
 
-	SynthDef(\fatPad, {
-		|freq = 440, amp = 0.3, gate = 1, cutoff = 1000, rq = 0.5|
+         // CHORUS
+         chorusMix = 0.0, chorusDepth = 0.5, chorusRate = 0.15|
 
-		var osc1, osc2, signal, env, cutoffCtrl;
+        var osc1, osc2, signal, env;
+        var cutoffCtrl;
 
-		env = EnvGen.kr(Env.adsr(0.05, 0.4, 0.6, 0.8), gate, doneAction: 2);
+        var lfoF, delayTimeF, flanged;
 
-		osc1 = LFSaw.ar(freq);
-		osc2 = LFSaw.ar(freq * 1.005);
+        var lfo1, lfo2, lfo3;
+        var d1, d2, d3, chorusSignal;
 
-		signal = Mix([osc1, osc2]) * 0.5;
-		signal = signal + DelayC.ar(signal, 0.02, SinOsc.kr(0.1).range(0.01, 0.02));
+        env = EnvGen.kr(
+            Env.adsr(0.05, 0.4, 0.6, 0.8),
+            gate,
+            doneAction: 2
+        );
 
-		cutoffCtrl = Lag.kr(cutoff.clip(20, 20000), 0.05);
+        osc1 = LFSaw.ar(freq);
+        osc2 = LFSaw.ar(freq * 1.005);
 
-		signal = RLPF.ar(signal, cutoffCtrl, rq);
+        signal = Mix([osc1, osc2]) * 0.5;
 
-		Out.ar(0, Pan2.ar(signal * env * amp, 0));
-	}).add;
+        signal = signal + DelayC.ar(
+            signal,
+            0.02,
+            SinOsc.kr(0.1).range(0.01, 0.02)
+        );
 
-	s.sync; // Wait until SynthDef is fully registered on the server
+        cutoffCtrl = Lag.kr(cutoff.clip(20, 20000), 0.05);
+        signal = RLPF.ar(signal, cutoffCtrl, rq);
 
-	// MIDI note management with sustain pedal support.
-   // Notes released during sustain are stored and closed when the pedal is lifted.
+        // ---------- FLANGER ----------
+        lfoF = SinOsc.kr(flangerRate).range(0, flangerDepth);
+        delayTimeF = lfoF.linlin(0, 1, 0.001, 0.008);
+        flanged = DelayC.ar(signal, 0.01, delayTimeF);
 
-	// 1. Sustain pedal handling (CC 64)
-	MIDIdef.cc(\sustainPedal, {
-		|val, num, chan, src|
-		if (num == 64) {
-			if (val >= 64) {
-				~sustainActive = true;
-				//"Sustain ON".postln;
-			} {
-				~sustainActive = false;
-				//"Sustain OFF".postln;
-				// When the pedal is released, stop all notes that were held by sustain
-				~releasedNotes.do { |synth, i|
-					if (synth.notNil) {
-						synth.set(\gate, 0);
-						~releasedNotes[i] = nil;
-					}
-				};
-			};
-		};
-	});
+        signal = XFade2.ar(
+            signal,
+            flanged,
+            flangerMix.linlin(0, 1, -1, 1)
+        );
 
-	// 2. Note ON handling
-	MIDIdef.noteOn(\noteOnPad, { |vel, num, chan, src|
-		// If the note is already active (e.g. due to sustain), stop it before retriggering
-		if (~notes[num].notNil) { ~notes[num].set(\gate, 0) };
-		if (~releasedNotes[num].notNil) {~releasedNotes[num].set(\gate, 0); ~releasedNotes[num] = nil; };
+        // ---------- CHORUS ----------
+        lfo1 = SinOsc.kr(chorusRate, 0).range(0, chorusDepth);
+        lfo2 = SinOsc.kr(chorusRate, 2pi/3).range(0, chorusDepth);
+        lfo3 = SinOsc.kr(chorusRate, 4pi/3).range(0, chorusDepth);
 
-		~notes[num] = Synth(\fatPad, [
-			\freq, num.midicps,
-			\amp, vel.linlin(0, 127, 0, 0.4),
-			\cutoff, vel.linexp(0, 127, 300, 7000),
-			\rq, 0.5
-		]);
-	});
+        d1 = lfo1.linlin(0, 1, 0.01, 0.03);
+        d2 = lfo2.linlin(0, 1, 0.01, 0.03);
+        d3 = lfo3.linlin(0, 1, 0.01, 0.03);
 
-	// 3. Note OFF handling
-	MIDIdef.noteOff(\noteOffPad, { |vel, num, chan, src|
-		if (~sustainActive) {
-			// If sustain pedal is down, move the synth to the held-notes buffer
-			~releasedNotes[num] = ~notes[num];
-			~notes[num] = nil;
-		} {
-			// If sustain pedal is up, release the note immediately
-			~notes[num].set(\gate, 0);
-			~notes[num] = nil;
-		};
-	});
+        chorusSignal = Mix([
+            DelayC.ar(signal, 0.05, d1),
+            DelayC.ar(signal, 0.05, d2),
+            DelayC.ar(signal, 0.05, d3)
+        ]) / 3;
 
-	// OSC receivers compatible with Python-based hand tracking.
-   // Hand openness and rotation are streamed independently.
+        signal = XFade2.ar(
+            signal,
+            chorusSignal,
+            chorusMix.linlin(0, 1, -1, 1)
+        );
 
+        Out.ar(0, Pan2.ar(signal * env * amp, 0));
 
+    }).add;
 
-	OSCdef(\leftHandOpen, { |msg|
-		~gestureData[\openness] = msg[1].asFloat.clip(0.0, 1.0);
-		~lastGestureTime = AppClock.seconds;
-		msg.postln;
-	}, '/hand/left/open', recvPort: 57130);
-	// recvPort: 57130 for juce implementation | 9000 for python
+    s.sync;
 
-	// Control routine that maps gesture data to continuous synth parameters.
+    // =========================
+    // MIDI
+    // =========================
 
-	~controlRoutine = Routine({
-    loop {
-        var elapsed = AppClock.seconds - ~lastGestureTime;
-        var cutoff;
+    MIDIdef.cc(\sustainPedal, { |val, num|
+        if (num == 64) {
+            if (val >= 64) {
+                ~sustainActive = true;
+            } {
+                ~sustainActive = false;
+                ~releasedNotes.do { |synth, i|
+                    if (synth.notNil) {
+                        synth.set(\gate, 0);
+                        ~releasedNotes[i] = nil;
+                    }
+                };
+            };
+        };
+    });
 
-        cutoff = if (elapsed > 0.3) {
-            200
-        } {
-            ~gestureData[\openness].linexp(0, 1, 200, 8000)
+    MIDIdef.noteOn(\noteOnPad, { |vel, num|
+        if (~notes[num].notNil) { ~notes[num].set(\gate, 0) };
+        if (~releasedNotes[num].notNil) {
+            ~releasedNotes[num].set(\gate, 0);
+            ~releasedNotes[num] = nil;
         };
 
-        // Update active notes
-			~notes.do { |synth|
-				if (synth.notNil) {
-					synth.set(\cutoff, cutoff);
-				};
-			};
+        ~notes[num] = Synth(\fatPad, [
+            \freq, num.midicps,
+            \amp, vel.linlin(0, 127, 0, 0.4),
+            \cutoff, vel.linexp(0, 127, 300, 7000),
+            \rq, 0.5
+        ]);
+    });
 
-			~releasedNotes.do { |synth|
-				if (synth.notNil) {
-					synth.set(\cutoff, cutoff);
-				};
-			};
+    MIDIdef.noteOff(\noteOffPad, { |vel, num|
+        if (~sustainActive) {
+            ~releasedNotes[num] = ~notes[num];
+            ~notes[num] = nil;
+        } {
+            ~notes[num].set(\gate, 0);
+            ~notes[num] = nil;
+        };
+    });
 
+    // =========================
+    // OSC FROM PYTHON
+    // =========================
 
-        0.02.wait;
-    }
-}).play(AppClock);
+    OSCdef(\leftHandOpen, { |msg|
+        ~gestureData[\openness] = msg[1].asFloat.clip(0.0, 1.0);
+        ~lastGestureTime = AppClock.seconds;
+    }, '/hand/left/open', recvPort: 57130);
+
+    OSCdef(\leftThumb, { |msg|
+        ~gestureData[\thumb] = msg[1].asFloat.clip(0.0, 1.0);
+        ~lastGestureTime = AppClock.seconds;
+    }, '/hand/left/thumb', recvPort: 57130);
+
+    OSCdef(\rightHandOpen, { |msg|
+        ~gestureData[\rightOpen] = msg[1].asFloat.clip(0.0, 1.0);
+        ~lastGestureTime = AppClock.seconds;
+    }, '/hand/right/open', recvPort: 57130);
+
+    // =========================
+    // CONTROL ROUTINE
+    // =========================
+
+    ~controlRoutine = Routine({
+        loop {
+            var elapsed, cutoff, thumb, right;
+            var fMix, fDepth, fRate;
+            var cMix, cDepth, cRate;
+
+            elapsed = AppClock.seconds - ~lastGestureTime;
+
+            if (elapsed > 0.3) {
+                cutoff = 200;
+                thumb = 0;
+                right = 0;
+            } {
+                cutoff = ~gestureData[\openness].linexp(0, 1, 200, 8000);
+                thumb  = ~gestureData[\thumb];
+                right  = ~gestureData[\rightOpen];
+            };
+
+            // FLANGER (pollice sx)
+            fMix   = thumb;
+            fDepth = thumb;
+            fRate  = thumb.linexp(0, 1, 0.05, 0.5);
+
+            // CHORUS (mano dx)
+            cMix   = right;
+            cDepth = right;
+            cRate  = right.linexp(0, 1, 0.08, 0.3);
+
+            (~notes ++ ~releasedNotes).do { |synth|
+                if (synth.notNil) {
+                    synth.set(
+                        \cutoff, cutoff,
+
+                        \flangerMix, fMix,
+                        \flangerDepth, fDepth,
+                        \flangerRate, fRate,
+
+                        \chorusMix, cMix,
+                        \chorusDepth, cDepth,
+                        \chorusRate, cRate
+                    );
+                };
+            };
+
+            0.02.wait;
+        }
+    }).play(AppClock);
 
 });
