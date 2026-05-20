@@ -155,7 +155,7 @@ This is essential to avoid race conditions and crashes in real‑time applicatio
 ### OSC Forwarding
 After processing, the gesture value is sent to SuperCollider:
 ```cpp
-sender.connect("127.0.0.1", 57130);
+sender.connect("127.0.0.1", 57120);
 sender.send("/hand/left/open", val);
 ```
 This creates a direct mapping between gesture input and sound parameters.
