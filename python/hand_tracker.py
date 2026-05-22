@@ -10,12 +10,15 @@ from config import CAMERA_INDEX, MAX_HANDS, MIN_DET_CONF, MIN_TRACK_CONF
 class HandTracker:
     def __init__(self):
         # Camera
+        self.SHOW_CAMERA = True  # or False
         self.cap = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_DSHOW)
         if not self.cap.isOpened():
             raise RuntimeError(f"Impossibile aprire la webcam {CAMERA_INDEX}")
 
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        self.cap.set(cv2.CAP_PROP_FPS, 60) 
         time.sleep(0.3)  # warm-up webcam
 
         self.window_name = "Hand Tracker"
@@ -34,10 +37,13 @@ class HandTracker:
 
     def get_frame_and_hands(self):
         success, frame = self.cap.read()
-        frame = cv2.flip(frame, 1)  # Horizontal flip (mirror correction)
 
         if not success or frame is None:
             return None, []
+        
+        frame = cv2.flip(frame, 1)  # Horizontal flip (mirror correction)
+
+        
 
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = self.hands.process(frame_rgb)
@@ -79,8 +85,6 @@ class HandTracker:
         y = margin
 
         cv2.moveWindow(self.window_name, x, y)
-
-    SHOW_CAMERA = True  # or False
 
     def show(self, frame):
         if not self.SHOW_CAMERA or frame is None or frame.size == 0:

@@ -13,19 +13,29 @@ class OscSender:
         self.debug = debug
         self.debug_filter = debug_filter
 
+        
+    def _should_debug(self, address):
+        if not self.debug:
+                return False
+        if self.debug_filter is None:
+                return True
+        return any(f in address for f in self.debug_filter)
+
+    def _debug_print(self, address, value):
+        if self._should_debug(address):
+            if isinstance(value, (float, int)):
+                print(f"[OSC] {address} -> {value:.3f}")
+            else:
+                print(f"[OSC] {address} -> {value}")
+
+
     def send(self, address, value):
         """
         Sends a single float/int value
         """
         try:
             self.client.send_message(address, value)
-           
-            if self.debug_filter is None:
-                print(f"[OSC] {address} -> {value}")
-            else:
-                if any(f in address for f in self.debug_filter):
-                    print(f"[OSC] {address} -> {value}")
-
+            self._debug_print(address, value)
         except Exception as e:
             print(f"[OSC ERROR] {e}")
 
@@ -36,13 +46,6 @@ class OscSender:
         """
         try:
             self.client.send_message(address, values)
-            
-            if self.debug:
-                if self.debug_filter is None:
-                    print(f"[OSC] {address} -> {values}")
-                else:
-                    if any(f in address for f in self.debug_filter):
-                        print(f"[OSC] {address} -> {values}")
-
+            self._debug_print(address, values)
         except Exception as e:
             print(f"[OSC ERROR] {e}")

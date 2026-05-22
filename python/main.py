@@ -4,7 +4,6 @@ from hand_tracker import HandTracker
 from gesture_features import compute_hand_openness, compute_thumb_value
 from smoothing import SignalSmoother
 from osc_sender import OscSender
-import time
 from config import OSC_IP, OSC_PORT
 
 def main():
@@ -20,7 +19,7 @@ def main():
 
 
     # OSC
-    osc = OscSender(ip=OSC_IP, port=OSC_PORT, debug=True) # debug=True to print OSC messages values in console
+    osc = OscSender(ip=OSC_IP, port=OSC_PORT, debug=False) # debug=True to print OSC messages values in console
 
     while True:
         # Just one reading for each frame
@@ -37,13 +36,15 @@ def main():
                 if label == "Left":    
                     value = smooth_hand_left.process(openness)
                     osc.send("/hand/left/open", value)
-                    thumb = smooth_thumb_left.process(compute_thumb_value(landmarks))
+                    thumb_raw = compute_thumb_value(landmarks)
+                    thumb = smooth_thumb_left.process(thumb_raw)
                     osc.send("/hand/left/thumb", thumb)
 
                 elif label == "Right":
                     value = smooth_hand_right.process(openness)
                     osc.send("/hand/right/open", value)
-                    thumb = smooth_thumb_right.process(compute_thumb_value(landmarks))
+                    thumb_raw = compute_thumb_value(landmarks)
+                    thumb = smooth_thumb_right.process(thumb_raw)
                     osc.send("/hand/right/thumb", thumb)
             tracker.show(frame)
 

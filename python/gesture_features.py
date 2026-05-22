@@ -22,6 +22,8 @@ MIN_THUMB_DIST = 0.2
 MAX_THUMB_DIST = 0.40
 
 def normalize(value, min_val, max_val):
+    if max_val == min_val:
+            return 0.0
     value_clamped = max(min_val, min(value, max_val))
     return (value_clamped - min_val) / (max_val - min_val)
 

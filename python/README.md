@@ -1,13 +1,11 @@
 # Python - Gesture Recognition and Control Data
-This module implements the gesture recognition subsystem of the project.
+The module is designed as a standalone, stable, real‑time control data source, fully decoupled from the audio engine.
 It acquires live video from a webcam, extracts hand‑related gestural features in real time, and streams them as normalized control data to the audio engine via OSC.
 
 ## Overview
 - Input: webcam video stream
 - Processing: hand tracking and gesture feature extraction
 - Output: continuous OSC control signals (normalized, real‑time)
-
-The module is designed as a standalone and stable data source, decoupled from sound design and audio processing.
 
 ## Responsibilities
 - Webcam video acquisition (OpenCV)
@@ -16,13 +14,14 @@ The module is designed as a standalone and stable data source, decoupled from so
 - Real‑time OSC transmission
 
 ## Status
-### Implemented Features (Tested)
+### Implemented Features
 
 - Real‑time hand tracking from integrated or external USB webcam
 - Simultaneous tracking of two hands
 - Explicit left / right hand identification
 - Visualization of hand landmarks and skeletons
-- Continuous hand openness descriptor calculated independently for both hands, including separate thumb tracking
+- Continuous hand openness descriptor (independent for each hand)
+- Separate thumb‑openness descriptor for fine control
 - Stable execution at interactive frame rates on Windows
 
 ### Environment Setup (Conda/Python)
@@ -55,6 +54,12 @@ Represents the openness of the left hand
 - `/hand/right/open`: Continuous float value in range [0.0 – 1.0]
 Represents the openness of the right hand
 
+- `/hand/left/thumb`: Continuous float value in range [0.0 – 1.0]
+Represents the openness of the left thumb
+
+- `/hand/right/thumb`: Continuous float value in range [0.0 – 1.0]
+Represents the openness of the right thumb
+
 ### Code Structure
 - `main.py`:
 Entry point and runtime loop.
@@ -69,10 +74,9 @@ Main optimizations for stability and frame rate are implemented here.
 - `gesture_features.py`:
 Gesture descriptor definitions.
 Implements the hand openness feature using:
-
     - a virtual palm center
-weighted fingertip‑to‑palm distances
-    - Includes normalization and calibration logic.
+    - weighted fingertip-to-palm distances
+    - normalization and calibration logic
 
 - `smoothing.py`:
 Signal conditioning.
@@ -86,8 +90,3 @@ No gesture logic is implemented here.
 - `config.py`:
 Runtime configuration.
 Defines camera index, OSC network parameters, and optional hardware flags.
-
-- `arduino_input.py`:
-Optional extension (not used in current tests).
-Reserved for future Arduino‑based sensors.
-
