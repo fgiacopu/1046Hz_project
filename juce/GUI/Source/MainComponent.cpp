@@ -8,16 +8,17 @@ MainComponent::MainComponent()
     leftHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     leftHandKnob.setRange(0.0, 1.0);
     leftHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
-    leftHandKnob.setInterceptsMouseClicks(false, false);
+    leftHandKnob.setInterceptsMouseClicks(true, false);
 
-    // Turkish Blue Colors
-    leftHandKnob.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xff00a8b5)); // Vivid Turkish Teal
-    leftHandKnob.setColour(juce::Slider::thumbColourId, juce::Colour(0xff77e4d4));             // Soft Pale Turquoise
+    // Blue - Glasslike Colors
+    leftHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff00a8b5).withAlpha(0.12f)); // Frosted glass ring
+    leftHandKnob.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xff00a8b5).withAlpha(0.6f));    // Glass fill tint
+    leftHandKnob.setColour(juce::Slider::thumbColourId, juce::Colour(0xff77e4d4));                               // Opaque neon reflection
     leftHandKnob.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xff77e4d4));
     leftHandKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(leftKnobLabel);
-    leftKnobLabel.setText("Left Hand Openness", juce::dontSendNotification);
+    leftKnobLabel.setText("Left Hand Openness\n(Cut-off Frequency of Low Pass Filter)", juce::dontSendNotification);
     leftKnobLabel.setJustificationType(juce::Justification::centred);
     leftKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
 
@@ -25,16 +26,16 @@ MainComponent::MainComponent()
     leftThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     leftThumbSlider.setRange(0.0, 1.0);
     leftThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
-    leftThumbSlider.setInterceptsMouseClicks(false, false);
+    leftThumbSlider.setInterceptsMouseClicks(true, false);
 
-    // Turkish Blue Slider Colors
-    leftThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff00a8b5));
-    leftThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff00a8b5).withAlpha(0.2f));
+    // Blue - Glasslike Slider Colors
+    leftThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff00a8b5).withAlpha(0.15f));          // Smoked glass track
+    leftThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff77e4d4));                            // Glass handle
     leftThumbSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xff77e4d4));
     leftThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(leftThumbLabel);
-    leftThumbLabel.setText("Left Thumb Movement", juce::dontSendNotification);
+    leftThumbLabel.setText("Left Thumb Movement\n(Flanger)", juce::dontSendNotification);
     leftThumbLabel.setJustificationType(juce::Justification::centred);
     leftThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
 
@@ -44,16 +45,17 @@ MainComponent::MainComponent()
     rightHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     rightHandKnob.setRange(0.0, 1.0);
     rightHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
-    rightHandKnob.setInterceptsMouseClicks(false, false);
+    rightHandKnob.setInterceptsMouseClicks(true, false);
 
-    // Soft Dark Green Colors
-    rightHandKnob.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xff4a7c59)); // Matte Sage Green
-    rightHandKnob.setColour(juce::Slider::thumbColourId, juce::Colour(0xff9cb380));             // Soft Moss highlight
+    // Green - Glasslike Colors
+    rightHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff4a7c59).withAlpha(0.12f)); // Frosted glass ring
+    rightHandKnob.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xff4a7c59).withAlpha(0.6f));    // Glass fill tint
+    rightHandKnob.setColour(juce::Slider::thumbColourId, juce::Colour(0xff9cb380));                               // Opaque moss reflection
     rightHandKnob.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xff9cb380));
     rightHandKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(rightKnobLabel);
-    rightKnobLabel.setText("Right Hand (Chorus)", juce::dontSendNotification);
+    rightKnobLabel.setText("Right Hand Openness\n(Chorus)", juce::dontSendNotification);
     rightKnobLabel.setJustificationType(juce::Justification::centred);
     rightKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
 
@@ -61,18 +63,20 @@ MainComponent::MainComponent()
     rightThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     rightThumbSlider.setRange(0.0, 1.0);
     rightThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
-    rightThumbSlider.setInterceptsMouseClicks(false, false);
+    rightThumbSlider.setInterceptsMouseClicks(true, false);
 
-    // Soft Dark Green Slider Colors
-    rightThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff4a7c59));
-    rightThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff4a7c59).withAlpha(0.2f));
+    // Green - Glasslike Slider Colors
+    rightThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff4a7c59).withAlpha(0.15f));          // Smoked glass track
+    rightThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff9cb380));                            // Glass handle
     rightThumbSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xff9cb380));
     rightThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(rightThumbLabel);
-    rightThumbLabel.setText("Right Thumb Movement", juce::dontSendNotification);
+    rightThumbLabel.setText("Right Thumb Movement\n(TODO)", juce::dontSendNotification);
     rightThumbLabel.setJustificationType(juce::Justification::centred);
     rightThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
+    
+    
     // Make sure you set the size of the component after
     // you add any child components.
     setSize(800, 600);
@@ -158,10 +162,14 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
 //==============================================================================
 void MainComponent::paint(juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+    juce::Colour topColor(0xff1a1d24);
+    juce::Colour bottomColor(0xff111317);
 
-    // You can add your drawing code here!
+    juce::ColourGradient gradient(topColor, 0.0f, 0.0f,
+        bottomColor, 0.0f, static_cast<float>(getHeight()),
+        false);
+    g.setGradientFill(gradient);
+    g.fillAll();
 }
 
 void MainComponent::resized()
@@ -170,25 +178,36 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 
-    auto area = getLocalBounds().reduced(20);
+    // Add side and top margins so elements don't hug the window borders
+    auto area = getLocalBounds().reduced(40, 30);
 
-    // Split layout cleanly into Left and Right columns
-    auto leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    auto rightColumn = area; // The remaining right-hand side
+    // Split the window into two distinct horizontal zones
+    auto topRowArea = area.removeFromTop(area.getHeight() * 0.55);
+    auto bottomRowArea = area; // What remains at the bottom
 
-    // --- Left Column Layout ---
-    auto leftTopArea = leftColumn.removeFromTop(leftColumn.getHeight() * 0.5);
-    leftHandKnob.setBounds(leftTopArea.withSizeKeepingCentre(200, 200));
-    leftKnobLabel.setBounds(leftHandKnob.getX(), leftHandKnob.getBottom(), leftHandKnob.getWidth(), 25);
+    // --- 1. DIVIDE TOP ROW (KNOBS) ---
+    auto leftKnobZone = topRowArea.removeFromLeft(topRowArea.getWidth() * 0.5);
+    auto rightKnobZone = topRowArea;
 
-    leftThumbSlider.setBounds(leftColumn.withSizeKeepingCentre(300, 60));
-    leftThumbLabel.setBounds(leftThumbSlider.getX(), leftThumbSlider.getBottom(), leftThumbSlider.getWidth(), 25);
+    // Left Knob & Label
+    leftHandKnob.setBounds(leftKnobZone.withSizeKeepingCentre(180, 180).translated(0, -15));
+    // Position label directly under the knob with ample room for long text strings
+    leftKnobLabel.setBounds(leftKnobZone.getX() + 10, leftHandKnob.getBottom() + 2, leftKnobZone.getWidth() - 20, 45);
 
-    // --- Right Column Layout ---
-    auto rightTopArea = rightColumn.removeFromTop(rightColumn.getHeight() * 0.5);
-    rightHandKnob.setBounds(rightTopArea.withSizeKeepingCentre(200, 200));
-    rightKnobLabel.setBounds(rightHandKnob.getX(), rightHandKnob.getBottom(), rightHandKnob.getWidth(), 25);
+    // Right Knob & Label
+    rightHandKnob.setBounds(rightKnobZone.withSizeKeepingCentre(180, 180).translated(0, -15));
+    rightKnobLabel.setBounds(rightKnobZone.getX() + 10, rightHandKnob.getBottom() + 2, rightKnobZone.getWidth() - 20, 45);
 
-    rightThumbSlider.setBounds(rightColumn.withSizeKeepingCentre(300, 60));
-    rightThumbLabel.setBounds(rightThumbSlider.getX(), rightThumbSlider.getBottom(), rightThumbSlider.getWidth(), 25);
+
+    // --- 2. DIVIDE BOTTOM ROW (SLIDERS) ---
+    auto leftSliderZone = bottomRowArea.removeFromLeft(bottomRowArea.getWidth() * 0.5);
+    auto rightSliderZone = bottomRowArea;
+
+    // Left Slider & Label
+    leftThumbSlider.setBounds(leftSliderZone.withSizeKeepingCentre(280, 50).translated(0, -15));
+    leftThumbLabel.setBounds(leftSliderZone.getX() + 10, leftThumbSlider.getBottom() + 2, leftSliderZone.getWidth() - 20, 45);
+
+    // Right Slider & Label
+    rightThumbSlider.setBounds(rightSliderZone.withSizeKeepingCentre(280, 50).translated(0, -15));
+    rightThumbLabel.setBounds(rightSliderZone.getX() + 10, rightThumbSlider.getBottom() + 2, rightSliderZone.getWidth() - 20, 45);
 }
