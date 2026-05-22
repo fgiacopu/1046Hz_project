@@ -16,18 +16,45 @@ parameters, providing a graphical user interface, and optionally applying audio 
 
 - OSC message reception from Python module
 - Real‑time parsing of continuous gestural descriptors
-- Graphical visualization of gesture parameters using a rotary slider
+- Graphical visualization of gesture parameters using rotary sliders for the left and right hand openness, and linear sliders for left and right thumb movements
+- Allowing for manual interaction when a camera is not connected.
+- Receiving default ADSR envelope parameters from SuperCollider upon initialization
+- Enabling, disabling selectively the incoming biomechanical data streams via a 2x2 grid of GUI toggle switches.
 - OSC forwarding to SuperCollider sound engine
 - Standalone GUI application for testing and debugging
 
 ## OSC Interface
-### Input (from Python)
+### Inputs (listening on port 9000)
+## --> From Python (Biomechanical Data)
 - `/hand/left/open`: Continuous float value in range [0.0 – 1.0]  
   Represents the openness of the left hand
 
 ### Output (to SuperCollider)
 - `/hand/left/open`: Continuous float value in range [0.0 – 1.0]  
-  Direct mapping of hand openness to a sound parameter
+  Direct mapping of hand openness to low pass filter cut-off
+
+
+- /hand/right/open (Mapped to Chorus)
+
+/hand/left/thumb (Mapped to Flanger)
+
+/hand/right/thumb (TODO)
+
+From SuperCollider (Envelope Defaults):
+Float values to synchronize GUI on startup
+
+/attack
+
+/decay
+
+/sustaain (Note: Intentional spelling to match SC backend)
+
+/releasee (Note: Intentional spelling to match SC backend)
+
+Output (Sending to Port 57120)
+To SuperCollider:
+
+Direct forwarding of the four /hand/... biomechanical parameters (if the corresponding UI toggle switch is active).
 
 ## Functional Description
 The JUCE module performs three main operations:
@@ -43,7 +70,8 @@ The JUCE module performs three main operations:
 - Ensures thread safety when interacting with UI components  
 
 ### 3. Parameter Forwarding
-- Sends processed control values via OSC to SuperCollider (`127.0.0.1:57120`)
+- Checks the state of the biomechanical toggle switches.
+- If a channel is active, the value is forwarded via OSC to SuperCollider (127.0.0.1:57120). If disabled, the OSC message is blocked.
 - Enables real‑time mapping between gesture descriptors and sound synthesis parameters
 
 ## Execution
@@ -57,9 +85,9 @@ To run the application:
 3. Build and run the application  
 
 Once running:
-- The GUI displays a rotary control representing hand openness  
-- OSC messages are received in real time from Python  
-- Processed values are forwarded to SuperCollider  
+- The GUI displays a different controls  
+- OSC messages are received in real time from Python and SuperCollider,  also the processed messages received from Python are sent to SuperCollider
+- Users can manually control the synth via the GUI or toggle inputs on/off to let the camera drive the sound.
 
 ## Code Structure
 

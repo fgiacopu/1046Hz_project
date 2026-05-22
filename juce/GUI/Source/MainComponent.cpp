@@ -29,8 +29,8 @@ MainComponent::MainComponent()
     leftThumbSlider.setInterceptsMouseClicks(true, false);
 
     // Blue - Glasslike Slider Colors
-    leftThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff00a8b5).withAlpha(0.15f));          // Smoked glass track
-    leftThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff77e4d4));                            // Glass handle
+    leftThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff00a8b5).withAlpha(0.6f));          // Smoked glass track
+    leftThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff77e4d4));                          // Glass handle
     leftThumbSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xff77e4d4));
     leftThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
@@ -66,7 +66,7 @@ MainComponent::MainComponent()
     rightThumbSlider.setInterceptsMouseClicks(true, false);
 
     // Green - Glasslike Slider Colors
-    rightThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff4a7c59).withAlpha(0.15f));          // Smoked glass track
+    rightThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff4a7c59).withAlpha(0.6f));          // Smoked glass track
     rightThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff9cb380));                            // Glass handle
     rightThumbSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colour(0xff9cb380));
     rightThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
@@ -77,8 +77,122 @@ MainComponent::MainComponent()
     rightThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
     
     
-    // Make sure you set the size of the component after
-    // you add any child components.
+    // === ENVELOPE CONFIGURATION (A, S, D, R) ===
+    juce::Colour envColor(0xffa363c9);
+
+    // Attack
+    addAndMakeVisible(attackKnob);
+    attackKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    attackKnob.setRange(0.0, 1.0);
+    attackKnob.setValue(0.0);
+    attackKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    attackKnob.setNumDecimalPlacesToDisplay(3);
+    attackKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
+    attackKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
+    attackKnob.setColour(juce::Slider::thumbColourId, envColor);
+    attackKnob.setColour(juce::Slider::textBoxTextColourId, envColor);
+    attackKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+
+    addAndMakeVisible(attackLabel);
+    attackLabel.setText("A", juce::dontSendNotification);
+    attackLabel.setJustificationType(juce::Justification::centred);
+    attackLabel.setColour(juce::Label::textColourId, envColor);
+
+    // Decay
+    addAndMakeVisible(decayKnob);
+    decayKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    decayKnob.setRange(0.0, 1.0);
+    decayKnob.setValue(0.0);
+    decayKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    decayKnob.setNumDecimalPlacesToDisplay(3);
+    decayKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
+    decayKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
+    decayKnob.setColour(juce::Slider::thumbColourId, envColor);
+    decayKnob.setColour(juce::Slider::textBoxTextColourId, envColor);
+    decayKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+
+    addAndMakeVisible(decayLabel);
+    decayLabel.setText("D", juce::dontSendNotification);
+    decayLabel.setJustificationType(juce::Justification::centred);
+    decayLabel.setColour(juce::Label::textColourId, envColor);
+
+    // Sustain
+    addAndMakeVisible(sustainKnob);
+    sustainKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    sustainKnob.setRange(0.0, 1.0);
+    sustainKnob.setValue(0.0);
+    sustainKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    sustainKnob.setNumDecimalPlacesToDisplay(3);
+    sustainKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
+    sustainKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
+    sustainKnob.setColour(juce::Slider::thumbColourId, envColor);
+    sustainKnob.setColour(juce::Slider::textBoxTextColourId, envColor);
+    sustainKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+
+    addAndMakeVisible(sustainLabel);
+    sustainLabel.setText("S", juce::dontSendNotification);
+    sustainLabel.setJustificationType(juce::Justification::centred);
+    sustainLabel.setColour(juce::Label::textColourId, envColor);
+
+    // Release
+    addAndMakeVisible(releaseKnob);
+    releaseKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    releaseKnob.setRange(0.0, 1.0);
+    releaseKnob.setValue(0.0);
+    releaseKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    releaseKnob.setNumDecimalPlacesToDisplay(3);
+    releaseKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
+    releaseKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
+    releaseKnob.setColour(juce::Slider::thumbColourId, envColor);
+    releaseKnob.setColour(juce::Slider::textBoxTextColourId, envColor);
+    releaseKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+
+    addAndMakeVisible(releaseLabel);
+    releaseLabel.setText("R", juce::dontSendNotification);
+    releaseLabel.setJustificationType(juce::Justification::centred);
+    releaseLabel.setColour(juce::Label::textColourId, envColor);
+
+    // Toggle Switches
+    juce::Colour offGrey(0xff2a2d34);
+
+    // Left Hand Toggle
+    addAndMakeVisible(leftHandToggle);
+    //leftHandToggle.setButtonText("Leftn/Hand");
+    leftHandToggle.setClickingTogglesState(true);
+    leftHandToggle.setColour(juce::TextButton::buttonColourId, offGrey);
+    leftHandToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff77e4d4).withAlpha(0.6f));
+    leftHandToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
+    leftHandToggle.setToggleState(true, juce::dontSendNotification);
+
+    // Right Hand Toggle
+    addAndMakeVisible(rightHandToggle);
+    //rightHandToggle.setButtonText("Rightn/Hand");
+    rightHandToggle.setClickingTogglesState(true);
+    rightHandToggle.setColour(juce::TextButton::buttonColourId, offGrey);
+    rightHandToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff9cb380).withAlpha(0.6f));
+    rightHandToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
+    rightHandToggle.setToggleState(true, juce::dontSendNotification);
+
+    // Left Thumb Toggle
+    addAndMakeVisible(leftThumbToggle);
+    //leftThumbToggle.setButtonText("Leftn/Thumb");
+    leftThumbToggle.setClickingTogglesState(true);
+    leftThumbToggle.setColour(juce::TextButton::buttonColourId, offGrey);
+    leftThumbToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff77e4d4).withAlpha(0.6f));
+    leftThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
+    leftThumbToggle.setToggleState(true, juce::dontSendNotification);
+
+    // Right Thumb Toggle
+    addAndMakeVisible(rightThumbToggle);
+    //rightThumbToggle.setButtonText("Rightn/Thumb");
+    rightThumbToggle.setClickingTogglesState(true);
+    rightThumbToggle.setColour(juce::TextButton::buttonColourId, offGrey);
+    rightThumbToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff9cb380).withAlpha(0.6f));
+    rightThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
+    rightThumbToggle.setToggleState(true, juce::dontSendNotification);
+
+
+    // Setting the size of the component after adding any child components is necessary
     setSize(800, 600);
 
     // Some platforms require permissions to open input channels so request that here
@@ -137,25 +251,56 @@ void MainComponent::releaseResources()
 }
 
 void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
-{ 
+{
     auto pattern = message.getAddressPattern().toString();
 
     if (message.size() > 0 && message[0].isFloat32())
     {
         float val = message[0].getFloat32();
-        sender.send(pattern, val);
-        // Update UI knob safely on the main Thread
-        juce::MessageManager::callAsync([this, val, pattern]() {
-            if (pattern == "/hand/left/open")
-                leftHandKnob.setValue(val, juce::dontSendNotification);
-            else if (pattern == "/hand/right/open")
-                rightHandKnob.setValue(val, juce::dontSendNotification);
-            else if (pattern == "/hand/left/thumb")
-                leftThumbSlider.setValue(val, juce::dontSendNotification);
-            else if (pattern == "/hand/right/thumb")
-                rightThumbSlider.setValue(val, juce::dontSendNotification);
-            });
 
+        // From Supercollider: Envelope Defaults
+        if (pattern == "/attack" || pattern == "/decay" || pattern == "/sustaain" || pattern == "/releasee")
+        {
+            juce::MessageManager::callAsync([this, val, pattern]() {
+                if (pattern == "/attack")
+                    attackKnob.setValue(val, juce::dontSendNotification);
+                else if (pattern == "/decay")
+                    decayKnob.setValue(val, juce::dontSendNotification);
+                else if (pattern == "/sustaain")
+                    sustainKnob.setValue(val, juce::dontSendNotification);
+                else if (pattern == "/releasee")
+                    releaseKnob.setValue(val, juce::dontSendNotification);
+                });
+
+            return;
+        }
+
+        // From Python: Biomechanical Inputs
+        // These update the GUI and then get forwarded to Supercollider, but only if the switch is ON.
+        bool shouldProcess = true;
+
+        if (pattern == "/hand/left/open" && !leftHandToggle.getToggleState()) shouldProcess = false;
+        else if (pattern == "/hand/right/open" && !rightHandToggle.getToggleState()) shouldProcess = false;
+        else if (pattern == "/hand/left/thumb" && !leftThumbToggle.getToggleState()) shouldProcess = false;
+        else if (pattern == "/hand/right/thumb" && !rightThumbToggle.getToggleState()) shouldProcess = false;
+
+        if (shouldProcess)
+        {
+            // Forwarding to SuperCollider
+            sender.send(pattern, val);
+
+            // Update UI safely on the main Thread
+            juce::MessageManager::callAsync([this, val, pattern]() {
+                if (pattern == "/hand/left/open")
+                    leftHandKnob.setValue(val, juce::dontSendNotification);
+                else if (pattern == "/hand/right/open")
+                    rightHandKnob.setValue(val, juce::dontSendNotification);
+                else if (pattern == "/hand/left/thumb")
+                    leftThumbSlider.setValue(val, juce::dontSendNotification);
+                else if (pattern == "/hand/right/thumb")
+                    rightThumbSlider.setValue(val, juce::dontSendNotification);
+                });
+        }
     }
 }
 
@@ -175,39 +320,79 @@ void MainComponent::paint(juce::Graphics& g)
 void MainComponent::resized()
 {
     // This is called when the MainContentComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
+    // After adding any child components, their positions have to be updated here.
 
-    // Add side and top margins so elements don't hug the window borders
+    // Add side and top margins
     auto area = getLocalBounds().reduced(40, 30);
 
-    // Split the window into two distinct horizontal zones
-    auto topRowArea = area.removeFromTop(area.getHeight() * 0.55);
-    auto bottomRowArea = area; // What remains at the bottom
+    // Split the window into three distinct vertical zones
+    auto topRowArea = area.removeFromTop(area.getHeight() * 0.33f);
+    auto middleRowArea = area.removeFromTop(area.getHeight() * 0.5f);
+    auto bottomRowArea = area;
 
-    // --- 1. DIVIDE TOP ROW (KNOBS) ---
-    auto leftKnobZone = topRowArea.removeFromLeft(topRowArea.getWidth() * 0.5);
-    auto rightKnobZone = topRowArea;
+    // Save the Y-coordinate of the line that separates the knobs and sliders
+    int dividingLineY = middleRowArea.getBottom();
+    int centerX = getLocalBounds().getCentreX();
 
-    // Left Knob & Label
-    leftHandKnob.setBounds(leftKnobZone.withSizeKeepingCentre(180, 180).translated(0, -15));
-    // Position label directly under the knob with ample room for long text strings
+    // Dividing top row (A, D, S, R)
+    auto colWidth = topRowArea.getWidth() / 4;
+    auto aZone = topRowArea.removeFromLeft(colWidth);
+    auto dZone = topRowArea.removeFromLeft(colWidth);
+    auto sZone = topRowArea.removeFromLeft(colWidth);
+    auto rZone = topRowArea;
+
+    int envKnobSize = 100;
+
+    attackKnob.setBounds(aZone.withSizeKeepingCentre(envKnobSize, envKnobSize).translated(0, -10));
+    attackLabel.setBounds(aZone.getX() + 10, attackKnob.getBottom(), aZone.getWidth() - 20, 30);
+
+    decayKnob.setBounds(dZone.withSizeKeepingCentre(envKnobSize, envKnobSize).translated(0, -10));
+    decayLabel.setBounds(dZone.getX() + 10, decayKnob.getBottom(), dZone.getWidth() - 20, 30);
+
+    sustainKnob.setBounds(sZone.withSizeKeepingCentre(envKnobSize, envKnobSize).translated(0, -10));
+    sustainLabel.setBounds(sZone.getX() + 10, sustainKnob.getBottom(), sZone.getWidth() - 20, 30);
+
+    releaseKnob.setBounds(rZone.withSizeKeepingCentre(envKnobSize, envKnobSize).translated(0, -10));
+    releaseLabel.setBounds(rZone.getX() + 10, releaseKnob.getBottom(), rZone.getWidth() - 20, 30);
+
+
+    // Dividing middle row (Hand openness knobs)
+    auto leftKnobZone = middleRowArea.removeFromLeft(middleRowArea.getWidth() * 0.5f);
+    auto rightKnobZone = middleRowArea;
+
+    int mainKnobSize = 150;
+
+    leftHandKnob.setBounds(leftKnobZone.withSizeKeepingCentre(mainKnobSize, mainKnobSize).translated(0, -10));
     leftKnobLabel.setBounds(leftKnobZone.getX() + 10, leftHandKnob.getBottom() + 2, leftKnobZone.getWidth() - 20, 45);
 
-    // Right Knob & Label
-    rightHandKnob.setBounds(rightKnobZone.withSizeKeepingCentre(180, 180).translated(0, -15));
+    rightHandKnob.setBounds(rightKnobZone.withSizeKeepingCentre(mainKnobSize, mainKnobSize).translated(0, -10));
     rightKnobLabel.setBounds(rightKnobZone.getX() + 10, rightHandKnob.getBottom() + 2, rightKnobZone.getWidth() - 20, 45);
 
 
-    // --- 2. DIVIDE BOTTOM ROW (SLIDERS) ---
-    auto leftSliderZone = bottomRowArea.removeFromLeft(bottomRowArea.getWidth() * 0.5);
+    // Divide bottom row (Thumb movement sliders)
+    auto leftSliderZone = bottomRowArea.removeFromLeft(bottomRowArea.getWidth() * 0.5f);
     auto rightSliderZone = bottomRowArea;
 
-    // Left Slider & Label
-    leftThumbSlider.setBounds(leftSliderZone.withSizeKeepingCentre(280, 50).translated(0, -15));
+    leftThumbSlider.setBounds(leftSliderZone.withSizeKeepingCentre(280, 50).translated(0, -10));
     leftThumbLabel.setBounds(leftSliderZone.getX() + 10, leftThumbSlider.getBottom() + 2, leftSliderZone.getWidth() - 20, 45);
 
-    // Right Slider & Label
-    rightThumbSlider.setBounds(rightSliderZone.withSizeKeepingCentre(280, 50).translated(0, -15));
+    rightThumbSlider.setBounds(rightSliderZone.withSizeKeepingCentre(280, 50).translated(0, -10));
     rightThumbLabel.setBounds(rightSliderZone.getX() + 10, rightThumbSlider.getBottom() + 2, rightSliderZone.getWidth() - 20, 45);
+
+
+    // 2x2 Toggle grid
+    int btnSize = 35; // Size of the square toggle buttons
+    int gap = 2;      // Pixels of space between the buttons
+
+    // Top-Left (Left Hand)
+    leftHandToggle.setBounds(centerX - btnSize - gap, dividingLineY - btnSize - gap, btnSize, btnSize);
+
+    // Top-Right (Right Hand)
+    rightHandToggle.setBounds(centerX + gap, dividingLineY - btnSize - gap, btnSize, btnSize);
+
+    // Bottom-Left (Left Thumb)
+    leftThumbToggle.setBounds(centerX - btnSize - gap, dividingLineY + gap, btnSize, btnSize);
+
+    // Bottom-Right (Right Thumb)
+    rightThumbToggle.setBounds(centerX + gap, dividingLineY + gap, btnSize, btnSize);
 }

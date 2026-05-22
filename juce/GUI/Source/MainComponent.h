@@ -28,7 +28,6 @@ public:
 
 private:
     //==============================================================================
-    // Your private member variables go here...
     juce::OSCReceiver receiver;
     juce::OSCSender sender;
 
@@ -36,7 +35,7 @@ private:
     juce::Slider leftHandKnob;
     juce::Label leftKnobLabel;
 
-    // Right Hand (Chorus) - NEW
+    // Right Hand (Chorus)
     juce::Slider rightHandKnob;
     juce::Label rightKnobLabel;
 
@@ -44,10 +43,28 @@ private:
     juce::Slider leftThumbSlider;
     juce::Label leftThumbLabel;
 
-    // Right Thumb 
+    // Right Thumb (????)
     juce::Slider rightThumbSlider;
     juce::Label rightThumbLabel;
 
+    // Biomechanical Toggle Switches
+    juce::TextButton leftHandToggle;
+    juce::TextButton rightHandToggle;
+    juce::TextButton leftThumbToggle;
+    juce::TextButton rightThumbToggle;
+
+    // ADSR Envelope Knobs
+    juce::Slider attackKnob;
+    juce::Label attackLabel;
+
+    juce::Slider decayKnob;
+    juce::Label decayLabel;
+
+    juce::Slider sustainKnob;
+    juce::Label sustainLabel;
+
+    juce::Slider releaseKnob;
+    juce::Label releaseLabel;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
