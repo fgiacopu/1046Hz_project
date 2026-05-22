@@ -4,3 +4,5 @@ __pycache__/
 
 # JUCE
 juce/GUI/Builds/
+
+desktop.ini

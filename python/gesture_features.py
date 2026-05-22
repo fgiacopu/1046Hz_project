@@ -87,5 +87,3 @@ def compute_thumb_value(landmarks):
     thumb_shaped = thumb_norm ** 1.8
 
     return thumb_shaped
-
-# def compute_hand_vibrato()
