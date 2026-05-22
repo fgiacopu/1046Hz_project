@@ -22,7 +22,7 @@ The module is designed as a standalone and stable data source, decoupled from so
 - Simultaneous tracking of two hands
 - Explicit left / right hand identification
 - Visualization of hand landmarks and skeletons
-- Continuous hand openness descriptor
+- Continuous hand openness descriptor calculated independently for both hands, including separate thumb tracking
 - Stable execution at interactive frame rates on Windows
 
 ### Environment Setup (Conda/Python)
@@ -91,21 +91,3 @@ Defines camera index, OSC network parameters, and optional hardware flags.
 Optional extension (not used in current tests).
 Reserved for future Arduino‑based sensors.
 
-## Future Extensions
-The following features are not implemented in the current version but represent
-conceptual extensions identified during development and testing.
-
-### Thumb‑based Articulation Trigger
-The thumb can be processed independently from hand openness to act as a discrete
-gesture trigger. A deliberate opposition movement of the thumb could be mapped to
-articulation changes (e.g. increased percussiveness or attack), providing expressive
-control without interfering with continuous parameters.
-
-### Gesture‑driven Vibrato
-A continuous vibrato effect could be obtained by detecting fast and sustained hand
-movements over time. Unlike static control, this approach would require intentional
-physical effort and velocity thresholds to avoid unintentional activation.
-
-### Additional Physiological Inputs
-Optional sensor data (e.g. heart rate via Arduino) could be integrated as an
-independent control layer, enabling bio‑feedback or tempo‑related modulation.
