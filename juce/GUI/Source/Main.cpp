@@ -64,17 +64,20 @@ public:
                                                           .findColour (juce::ResizableWindow::backgroundColourId),
                               DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
+            setUsingNativeTitleBar (false);
+            setTitleBarHeight(0);
             setContentOwned (new MainComponent(), true);
 
            #if JUCE_IOS || JUCE_ANDROID
             setFullScreen (true);
            #else
             setResizable (true, true);
-            centreWithSize (getWidth(), getHeight());
+            //centreWithSize (getWidth(), getHeight());
            #endif
 
             setVisible (true);
+
+            setFullScreen(true);
         }
 
         void closeButtonPressed() override

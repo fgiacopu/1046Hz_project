@@ -10,6 +10,12 @@ MainComponent::MainComponent()
     leftHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     leftHandKnob.setInterceptsMouseClicks(true, false);
 
+    leftHandKnob.textFromValueFunction = [](double value)
+        {
+            int freq = 20.0 * std::pow(1000.0, value);
+            return juce::String(freq) + " Hz";
+        };
+
     // Blue - Glasslike Colors
     leftHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff00a8b5).withAlpha(0.12f)); // Frosted glass ring
     leftHandKnob.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xff00a8b5).withAlpha(0.6f));    // Glass fill tint
@@ -22,11 +28,19 @@ MainComponent::MainComponent()
     leftKnobLabel.setJustificationType(juce::Justification::centred);
     leftKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
 
+
+
     addAndMakeVisible(leftThumbSlider);
     leftThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     leftThumbSlider.setRange(0.0, 1.0);
     leftThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     leftThumbSlider.setInterceptsMouseClicks(true, false);
+
+    leftThumbSlider.textFromValueFunction = [](double value)
+        {
+            int percentage = value * 100.0;
+            return juce::String(percentage) + " %";
+        };
 
     // Blue - Glasslike Slider Colors
     leftThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff00a8b5).withAlpha(0.6f));          // Smoked glass track
@@ -40,12 +54,19 @@ MainComponent::MainComponent()
     leftThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
 
 
+
     // === RIGHT HAND CONFIGURATION ===
     addAndMakeVisible(rightHandKnob);
     rightHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     rightHandKnob.setRange(0.0, 1.0);
     rightHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     rightHandKnob.setInterceptsMouseClicks(true, false);
+
+    rightHandKnob.textFromValueFunction = [](double value)
+        {
+            int percentage = value * 100.0;
+            return juce::String(percentage) + " %";
+        };
 
     // Green - Glasslike Colors
     rightHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff4a7c59).withAlpha(0.12f)); // Frosted glass ring
@@ -59,11 +80,19 @@ MainComponent::MainComponent()
     rightKnobLabel.setJustificationType(juce::Justification::centred);
     rightKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
 
+
+
     addAndMakeVisible(rightThumbSlider);
     rightThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     rightThumbSlider.setRange(0.0, 1.0);
     rightThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     rightThumbSlider.setInterceptsMouseClicks(true, false);
+
+    rightThumbSlider.textFromValueFunction = [](double value)
+        {
+            int percentage = value * 100.0;
+            return juce::String(percentage) + " %";
+        };
 
     // Green - Glasslike Slider Colors
     rightThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff4a7c59).withAlpha(0.6f));          // Smoked glass track
@@ -76,6 +105,7 @@ MainComponent::MainComponent()
     rightThumbLabel.setJustificationType(juce::Justification::centred);
     rightThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
     
+
     
     // === ENVELOPE CONFIGURATION (A, S, D, R) ===
     juce::Colour envColor(0xffa363c9);
@@ -190,6 +220,44 @@ MainComponent::MainComponent()
     rightThumbToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff9cb380).withAlpha(0.6f));
     rightThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
     rightThumbToggle.setToggleState(true, juce::dontSendNotification);
+
+    // Biomechanical Controls
+    leftHandKnob.onValueChange = [this]() {
+        if (!leftHandToggle.getToggleState())
+            sender.send("/hand/left/open", static_cast<float>(leftHandKnob.getValue()));
+        };
+
+    rightHandKnob.onValueChange = [this]() {
+        if (!rightHandToggle.getToggleState())
+            sender.send("/hand/right/open", static_cast<float>(rightHandKnob.getValue()));
+        };
+
+    leftThumbSlider.onValueChange = [this]() {
+        if (!leftThumbToggle.getToggleState())
+            sender.send("/hand/left/thumb", static_cast<float>(leftThumbSlider.getValue()));
+        };
+
+    rightThumbSlider.onValueChange = [this]() {
+        if (!rightThumbToggle.getToggleState())
+            sender.send("/hand/right/thumb", static_cast<float>(rightThumbSlider.getValue()));
+        };
+
+    // ADSR Envelope Controls
+    attackKnob.onValueChange = [this]() {
+        sender.send("/attack", static_cast<float>(attackKnob.getValue()));
+        };
+
+    decayKnob.onValueChange = [this]() {
+        sender.send("/decay", static_cast<float>(decayKnob.getValue()));
+        };
+
+    sustainKnob.onValueChange = [this]() {
+        sender.send("/sustaain", static_cast<float>(sustainKnob.getValue()));
+        };
+
+    releaseKnob.onValueChange = [this]() {
+        sender.send("/releasee", static_cast<float>(releaseKnob.getValue()));
+        };
 
 
     // Setting the size of the component after adding any child components is necessary
