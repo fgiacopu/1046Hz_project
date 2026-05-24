@@ -12,8 +12,12 @@ MainComponent::MainComponent()
 
     leftHandKnob.textFromValueFunction = [](double value)
         {
-            int freq = 20.0 * std::pow(1000.0, value);
-            return juce::String(freq) + " Hz";
+            double minFreq = 200.0;
+            double maxFreq = 8000.0;
+
+            double freq = minFreq * std::pow(maxFreq / minFreq, value);
+
+            return juce::String((int)freq) + " Hz";
         };
 
     // Blue - Glasslike Colors
@@ -192,7 +196,7 @@ MainComponent::MainComponent()
     leftHandToggle.setColour(juce::TextButton::buttonColourId, offGrey);
     leftHandToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff77e4d4).withAlpha(0.6f));
     leftHandToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
-    leftHandToggle.setToggleState(true, juce::dontSendNotification);
+    leftHandToggle.setToggleState(false, juce::dontSendNotification);
 
     // Right Hand Toggle
     addAndMakeVisible(rightHandToggle);
@@ -201,7 +205,8 @@ MainComponent::MainComponent()
     rightHandToggle.setColour(juce::TextButton::buttonColourId, offGrey);
     rightHandToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff9cb380).withAlpha(0.6f));
     rightHandToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
-    rightHandToggle.setToggleState(true, juce::dontSendNotification);
+    rightHandToggle.setToggleState(false, juce::dontSendNotification);
+
 
     // Left Thumb Toggle
     addAndMakeVisible(leftThumbToggle);
@@ -210,7 +215,7 @@ MainComponent::MainComponent()
     leftThumbToggle.setColour(juce::TextButton::buttonColourId, offGrey);
     leftThumbToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff77e4d4).withAlpha(0.6f));
     leftThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
-    leftThumbToggle.setToggleState(true, juce::dontSendNotification);
+    leftThumbToggle.setToggleState(false, juce::dontSendNotification);
 
     // Right Thumb Toggle
     addAndMakeVisible(rightThumbToggle);
@@ -219,28 +224,55 @@ MainComponent::MainComponent()
     rightThumbToggle.setColour(juce::TextButton::buttonColourId, offGrey);
     rightThumbToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff9cb380).withAlpha(0.6f));
     rightThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
-    rightThumbToggle.setToggleState(true, juce::dontSendNotification);
+    rightThumbToggle.setToggleState(false, juce::dontSendNotification);
 
     // Biomechanical Controls
-    leftHandKnob.onValueChange = [this]() {
-        if (!leftHandToggle.getToggleState())
+    auto sendAll = [this]()
+        {
             sender.send("/hand/left/open", static_cast<float>(leftHandKnob.getValue()));
-        };
-
-    rightHandKnob.onValueChange = [this]() {
-        if (!rightHandToggle.getToggleState())
             sender.send("/hand/right/open", static_cast<float>(rightHandKnob.getValue()));
-        };
-
-    leftThumbSlider.onValueChange = [this]() {
-        if (!leftThumbToggle.getToggleState())
             sender.send("/hand/left/thumb", static_cast<float>(leftThumbSlider.getValue()));
-        };
-
-    rightThumbSlider.onValueChange = [this]() {
-        if (!rightThumbToggle.getToggleState())
             sender.send("/hand/right/thumb", static_cast<float>(rightThumbSlider.getValue()));
         };
+
+    // Toggle
+    leftHandToggle.onClick = [this, sendAll]()
+        {
+            if (!leftHandToggle.getToggleState())
+                sender.send("/hand/left/open", 0.0f);
+
+            sendAll();
+        };
+
+    rightHandToggle.onClick = [this, sendAll]()
+        {
+            if (!rightHandToggle.getToggleState())
+                sender.send("/hand/right/open", 0.0f);
+
+            sendAll();
+        };
+
+    leftThumbToggle.onClick = [this, sendAll]()
+        {
+            if (!leftThumbToggle.getToggleState())
+                sender.send("/hand/left/thumb", 0.0f);
+
+            sendAll();
+        };
+
+    rightThumbToggle.onClick = [this, sendAll]()
+        {
+            if (!rightThumbToggle.getToggleState())
+                sender.send("/hand/right/thumb", 0.0f);
+
+            sendAll();
+        };
+
+    leftHandKnob.onValueChange = sendAll;
+    rightHandKnob.onValueChange = sendAll;
+    leftThumbSlider.onValueChange = sendAll;
+    rightThumbSlider.onValueChange = sendAll;
+
 
     // ADSR Envelope Controls
     attackKnob.onValueChange = [this]() {

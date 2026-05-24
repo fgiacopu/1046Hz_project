@@ -11,9 +11,8 @@ s.waitForBoot({
 
     "SuperCollider server booted".postln;
 
-    // =========================
+
     // GLOBAL STATE
-    // =========================
 
     ~notes = Array.newClear(128);
     ~releasedNotes = Array.newClear(128);
@@ -22,35 +21,43 @@ s.waitForBoot({
     ~lastGestureTime = AppClock.seconds;
 
     ~gestureData = (
-        openness: 0.0,   // mano sx apertura → cutoff
-        thumb: 0.0,      // pollice sx → flanger
-        rightOpen: 0.0   // mano dx apertura → chorus
+        openness: 0.0,
+        thumb: 0.0,
+        rightOpen: 0.0,
+        rightThumb: 0.0,
+
+        attack: 0.05,
+        decay: 0.4,
+        sustaain: 0.6,
+        releasee: 0.8
     );
 
-    // =========================
-    // SYNTHDEF (PAD + FLANGER + CHORUS)
-    // =========================
+
+    // SYNTHDEF
 
     SynthDef(\fatPad, {
         |freq = 440, amp = 0.3, gate = 1,
          cutoff = 1000, rq = 0.5,
 
-         // FLANGER
+         attack = 0.05, decay = 0.4, sustaain = 0.6, releasee = 0.8,
+
          flangerMix = 0.0, flangerDepth = 0.5, flangerRate = 0.2,
 
-         // CHORUS
-         chorusMix = 0.0, chorusDepth = 0.5, chorusRate = 0.15|
+         chorusMix = 0.0, chorusDepth = 0.5, chorusRate = 0.15,
+
+         delayTime = 0.2, delayMix = 0.0|
 
         var osc1, osc2, signal, env;
         var cutoffCtrl;
 
         var lfoF, delayTimeF, flanged;
-
         var lfo1, lfo2, lfo3;
         var d1, d2, d3, chorusSignal;
 
+        var delayed;
+
         env = EnvGen.kr(
-            Env.adsr(0.05, 0.4, 0.6, 0.8),
+            Env.adsr(attack, decay, sustaain, releasee),
             gate,
             doneAction: 2
         );
@@ -80,8 +87,8 @@ s.waitForBoot({
             flangerMix.linlin(0, 1, -1, 1)
         );
 
-        // ---------- CHORUS ----------
-        lfo1 = SinOsc.kr(chorusRate, 0).range(0, chorusDepth);
+        // CHORUS
+        lfo1 = SinOsc.kr(chorusRate).range(0, chorusDepth);
         lfo2 = SinOsc.kr(chorusRate, 2pi/3).range(0, chorusDepth);
         lfo3 = SinOsc.kr(chorusRate, 4pi/3).range(0, chorusDepth);
 
@@ -101,15 +108,23 @@ s.waitForBoot({
             chorusMix.linlin(0, 1, -1, 1)
         );
 
+        // DELAY (pollice dx)
+        delayed = DelayC.ar(signal, 1.0, delayTime);
+
+        signal = XFade2.ar(
+            signal,
+            delayed,
+            delayMix.linlin(0, 1, -1, 1)
+        );
+
         Out.ar(0, Pan2.ar(signal * env * amp, 0));
 
     }).add;
 
     s.sync;
 
-    // =========================
+
     // MIDI
-    // =========================
 
     MIDIdef.cc(\sustainPedal, { |val, num|
         if (num == 64) {
@@ -128,6 +143,7 @@ s.waitForBoot({
     });
 
     MIDIdef.noteOn(\noteOnPad, { |vel, num|
+
         if (~notes[num].notNil) { ~notes[num].set(\gate, 0) };
         if (~releasedNotes[num].notNil) {
             ~releasedNotes[num].set(\gate, 0);
@@ -138,7 +154,11 @@ s.waitForBoot({
             \freq, num.midicps,
             \amp, vel.linlin(0, 127, 0, 0.4),
             \cutoff, vel.linexp(0, 127, 300, 7000),
-            \rq, 0.5
+
+            \attack, ~gestureData[\attack],
+            \decay, ~gestureData[\decay],
+            \sustaain, ~gestureData[\sustaain],
+            \releasee, ~gestureData[\releasee]
         ]);
     });
 
@@ -152,56 +172,72 @@ s.waitForBoot({
         };
     });
 
-    // =========================
-    // OSC FROM PYTHON
-    // =========================
+
+    // OSC INPUT
+
+    OSCdef(\attack, { |msg|
+        ~gestureData[\attack] = msg[1].asFloat;
+    }, "/attack", recvPort: 57130);
+
+    OSCdef(\decay, { |msg|
+        ~gestureData[\decay] = msg[1].asFloat;
+    }, "/decay", recvPort: 57130);
+
+    OSCdef(\sustaain, { |msg|
+        ~gestureData[\sustaain] = msg[1].asFloat;
+    }, "/sustaain", recvPort: 57130);
+
+    OSCdef(\releasee, { |msg|
+        ~gestureData[\releasee] = msg[1].asFloat;
+    }, "/releasee", recvPort: 57130);
 
     OSCdef(\leftHandOpen, { |msg|
-        ~gestureData[\openness] = msg[1].asFloat.clip(0.0, 1.0);
+        ~gestureData[\openness] = msg[1].asFloat;
         ~lastGestureTime = AppClock.seconds;
     }, '/hand/left/open', recvPort: 57130);
 
     OSCdef(\leftThumb, { |msg|
-        ~gestureData[\thumb] = msg[1].asFloat.clip(0.0, 1.0);
+        ~gestureData[\thumb] = msg[1].asFloat;
         ~lastGestureTime = AppClock.seconds;
     }, '/hand/left/thumb', recvPort: 57130);
 
     OSCdef(\rightHandOpen, { |msg|
-        ~gestureData[\rightOpen] = msg[1].asFloat.clip(0.0, 1.0);
+        ~gestureData[\rightOpen] = msg[1].asFloat;
         ~lastGestureTime = AppClock.seconds;
     }, '/hand/right/open', recvPort: 57130);
 
-    // =========================
+    OSCdef(\rightThumb, { |msg|
+        ~gestureData[\rightThumb] = msg[1].asFloat;
+        ~lastGestureTime = AppClock.seconds;
+    }, '/hand/right/thumb', recvPort: 57130);
+
+
+
     // CONTROL ROUTINE
-    // =========================
 
     ~controlRoutine = Routine({
         loop {
-            var elapsed, cutoff, thumb, right;
+
+            var cutoff, thumb, right, rThumb;
             var fMix, fDepth, fRate;
             var cMix, cDepth, cRate;
+            var dMix, dTime;
 
-            elapsed = AppClock.seconds - ~lastGestureTime;
+            cutoff = ~gestureData[\openness].linexp(0, 1, 200, 8000);
+            thumb  = ~gestureData[\thumb];
+            right  = ~gestureData[\rightOpen];
+			   rThumb = ~gestureData[\rightThumb];
 
-            if (elapsed > 0.3) {
-                cutoff = 200;
-                thumb = 0;
-                right = 0;
-            } {
-                cutoff = ~gestureData[\openness].linexp(0, 1, 200, 8000);
-                thumb  = ~gestureData[\thumb];
-                right  = ~gestureData[\rightOpen];
-            };
-
-            // FLANGER (pollice sx)
             fMix   = thumb;
             fDepth = thumb;
             fRate  = thumb.linexp(0, 1, 0.05, 0.5);
 
-            // CHORUS (mano dx)
             cMix   = right;
             cDepth = right;
             cRate  = right.linexp(0, 1, 0.08, 0.3);
+
+            dMix  = rThumb;
+            dTime = rThumb.linexp(0, 1, 0.02, 0.6);
 
             (~notes ++ ~releasedNotes).do { |synth|
                 if (synth.notNil) {
@@ -214,7 +250,15 @@ s.waitForBoot({
 
                         \chorusMix, cMix,
                         \chorusDepth, cDepth,
-                        \chorusRate, cRate
+                        \chorusRate, cRate,
+
+                        \delayMix, dMix,
+                        \delayTime, dTime,
+
+                        \attack, ~gestureData[\attack],
+                        \decay, ~gestureData[\decay],
+                        \sustaain, ~gestureData[\sustaain],
+                        \releasee, ~gestureData[\releasee]
                     );
                 };
             };
