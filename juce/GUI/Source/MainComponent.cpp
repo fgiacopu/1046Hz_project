@@ -277,7 +277,7 @@ MainComponent::MainComponent()
 
         receiver.connect(9000); //Listen to Python
         receiver.addListener(this); //This class handles the data
-        sender.connect("127.0.0.1", 57120); //Forwording to SC
+        sender.connect("127.0.0.1", 57130); //Forwording to SC
     }
 }
 
