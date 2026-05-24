@@ -7,6 +7,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(leftHandKnob);
     leftHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     leftHandKnob.setRange(0.0, 1.0);
+    leftHandKnob.setValue(0.0);
     leftHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     leftHandKnob.setInterceptsMouseClicks(true, false);
 
@@ -19,6 +20,12 @@ MainComponent::MainComponent()
 
             return juce::String((int)freq) + " Hz";
         };
+
+	// Fake change to trigger the textFromValueFunction and update the display to show "200 Hz" at startup
+    leftHandKnob.setValue(0.0, juce::sendNotificationSync);
+    leftHandKnob.setValue(0.000001, juce::dontSendNotification);
+    leftHandKnob.setValue(0.0, juce::sendNotificationSync);
+
 
     // Blue - Glasslike Colors
     leftHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff00a8b5).withAlpha(0.12f)); // Frosted glass ring
@@ -37,6 +44,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(leftThumbSlider);
     leftThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     leftThumbSlider.setRange(0.0, 1.0);
+    leftThumbSlider.setValue(0.0);
     leftThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     leftThumbSlider.setInterceptsMouseClicks(true, false);
 
@@ -45,6 +53,11 @@ MainComponent::MainComponent()
             int percentage = value * 100.0;
             return juce::String(percentage) + " %";
         };
+
+	// Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    leftThumbSlider.setValue(0.0, juce::sendNotificationSync);
+    leftThumbSlider.setValue(0.000001, juce::dontSendNotification);
+    leftThumbSlider.setValue(0.0, juce::sendNotificationSync);
 
     // Blue - Glasslike Slider Colors
     leftThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff00a8b5).withAlpha(0.6f));          // Smoked glass track
@@ -63,6 +76,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(rightHandKnob);
     rightHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     rightHandKnob.setRange(0.0, 1.0);
+    rightHandKnob.setValue(0.0);
     rightHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     rightHandKnob.setInterceptsMouseClicks(true, false);
 
@@ -71,6 +85,11 @@ MainComponent::MainComponent()
             int percentage = value * 100.0;
             return juce::String(percentage) + " %";
         };
+
+	// Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    rightHandKnob.setValue(0.0, juce::sendNotificationSync);
+    rightHandKnob.setValue(0.000001, juce::dontSendNotification);
+    rightHandKnob.setValue(0.0, juce::sendNotificationSync);
 
     // Green - Glasslike Colors
     rightHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff4a7c59).withAlpha(0.12f)); // Frosted glass ring
@@ -89,6 +108,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(rightThumbSlider);
     rightThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     rightThumbSlider.setRange(0.0, 1.0);
+    rightThumbSlider.setValue(0.0);
     rightThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     rightThumbSlider.setInterceptsMouseClicks(true, false);
 
@@ -97,6 +117,11 @@ MainComponent::MainComponent()
             int percentage = value * 100.0;
             return juce::String(percentage) + " %";
         };
+
+	// Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    rightThumbSlider.setValue(0.0, juce::sendNotificationSync);
+    rightThumbSlider.setValue(0.000001, juce::dontSendNotification);
+    rightThumbSlider.setValue(0.0, juce::sendNotificationSync);
 
     // Green - Glasslike Slider Colors
     rightThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff4a7c59).withAlpha(0.6f));          // Smoked glass track
@@ -118,9 +143,9 @@ MainComponent::MainComponent()
     addAndMakeVisible(attackKnob);
     attackKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     attackKnob.setRange(0.0, 1.0);
-    attackKnob.setValue(0.0);
+    attackKnob.setValue(0.05);
     attackKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    attackKnob.setNumDecimalPlacesToDisplay(3);
+    attackKnob.setNumDecimalPlacesToDisplay(2);
     attackKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     attackKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     attackKnob.setColour(juce::Slider::thumbColourId, envColor);
@@ -136,9 +161,9 @@ MainComponent::MainComponent()
     addAndMakeVisible(decayKnob);
     decayKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     decayKnob.setRange(0.0, 1.0);
-    decayKnob.setValue(0.0);
+    decayKnob.setValue(0.4);
     decayKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    decayKnob.setNumDecimalPlacesToDisplay(3);
+    decayKnob.setNumDecimalPlacesToDisplay(2);
     decayKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     decayKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     decayKnob.setColour(juce::Slider::thumbColourId, envColor);
@@ -154,9 +179,9 @@ MainComponent::MainComponent()
     addAndMakeVisible(sustainKnob);
     sustainKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     sustainKnob.setRange(0.0, 1.0);
-    sustainKnob.setValue(0.0);
+    sustainKnob.setValue(0.6);
     sustainKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    sustainKnob.setNumDecimalPlacesToDisplay(3);
+    sustainKnob.setNumDecimalPlacesToDisplay(2);
     sustainKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     sustainKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     sustainKnob.setColour(juce::Slider::thumbColourId, envColor);
@@ -172,9 +197,9 @@ MainComponent::MainComponent()
     addAndMakeVisible(releaseKnob);
     releaseKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     releaseKnob.setRange(0.0, 1.0);
-    releaseKnob.setValue(0.0);
+    releaseKnob.setValue(0.8);
     releaseKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    releaseKnob.setNumDecimalPlacesToDisplay(3);
+    releaseKnob.setNumDecimalPlacesToDisplay(2);
     releaseKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     releaseKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     releaseKnob.setColour(juce::Slider::thumbColourId, envColor);
