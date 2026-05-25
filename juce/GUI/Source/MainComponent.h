@@ -25,6 +25,45 @@ public:
     //==============================================================================
     void paint(juce::Graphics& g) override;
     void resized() override;
+    class SpectrumComponent : public juce::Component,
+        private juce::Timer
+    {
+    public:
+        SpectrumComponent()
+        {
+            startTimerHz(30); // refresh 30 volte al secondo
+        }
+
+        void timerCallback() override
+        {
+            repaint();
+        }
+
+        void paint(juce::Graphics& g) override
+        {
+            g.fillAll(juce::Colour(0xff0f1115)); // sfondo scuro
+
+            g.setColour(juce::Colour(0xff00e5ff)); // linea
+
+            auto width = getWidth();
+            auto height = getHeight();
+
+            juce::Path spectrum;
+            spectrum.startNewSubPath(0, height);
+
+            for (int i = 0; i < width; ++i)
+            {
+                float cutoff = 0.5f; // per ora fisso
+
+                float value = std::exp(-i * cutoff * 0.01f);
+                float y = height - (value * 0.5f + 0.5f) * height;
+
+                spectrum.lineTo(i, y);
+            }
+
+            g.strokePath(spectrum, juce::PathStrokeType(2.0f));
+        }
+    };
 
 private:
     //==============================================================================
@@ -66,6 +105,7 @@ private:
     juce::Slider releaseKnob;
     juce::Label releaseLabel;
 
-
+    SpectrumComponent spectrum;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

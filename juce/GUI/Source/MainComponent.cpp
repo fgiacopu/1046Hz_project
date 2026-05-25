@@ -8,7 +8,7 @@ MainComponent::MainComponent()
     leftHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     leftHandKnob.setRange(0.0, 1.0);
     leftHandKnob.setValue(0.0);
-    leftHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    leftHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     leftHandKnob.setInterceptsMouseClicks(true, false);
 
     leftHandKnob.textFromValueFunction = [](double value)
@@ -35,9 +35,10 @@ MainComponent::MainComponent()
     leftHandKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(leftKnobLabel);
-    leftKnobLabel.setText("Left Hand Openness\n(Cut-off Frequency of Low Pass Filter)", juce::dontSendNotification);
+    leftKnobLabel.setText("LPF Cutoff", juce::dontSendNotification);
     leftKnobLabel.setJustificationType(juce::Justification::centred);
     leftKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
+    leftKnobLabel.setFont(juce::Font(18.0f));
 
 
 
@@ -45,7 +46,7 @@ MainComponent::MainComponent()
     leftThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     leftThumbSlider.setRange(0.0, 1.0);
     leftThumbSlider.setValue(0.0);
-    leftThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    leftThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     leftThumbSlider.setInterceptsMouseClicks(true, false);
 
     leftThumbSlider.textFromValueFunction = [](double value)
@@ -66,9 +67,10 @@ MainComponent::MainComponent()
     leftThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(leftThumbLabel);
-    leftThumbLabel.setText("Left Thumb Movement\n(Flanger)", juce::dontSendNotification);
+    leftThumbLabel.setText("Flanger", juce::dontSendNotification);
     leftThumbLabel.setJustificationType(juce::Justification::centred);
     leftThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
+    leftThumbLabel.setFont(juce::Font(18.0f));
 
 
 
@@ -77,7 +79,7 @@ MainComponent::MainComponent()
     rightHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     rightHandKnob.setRange(0.0, 1.0);
     rightHandKnob.setValue(0.0);
-    rightHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    rightHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     rightHandKnob.setInterceptsMouseClicks(true, false);
 
     rightHandKnob.textFromValueFunction = [](double value)
@@ -99,17 +101,17 @@ MainComponent::MainComponent()
     rightHandKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(rightKnobLabel);
-    rightKnobLabel.setText("Right Hand Openness\n(Chorus)", juce::dontSendNotification);
+    rightKnobLabel.setText("Chorus", juce::dontSendNotification);
     rightKnobLabel.setJustificationType(juce::Justification::centred);
     rightKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
-
+    rightKnobLabel.setFont(juce::Font(18.0f));
 
 
     addAndMakeVisible(rightThumbSlider);
     rightThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     rightThumbSlider.setRange(0.0, 1.0);
     rightThumbSlider.setValue(0.0);
-    rightThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    rightThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     rightThumbSlider.setInterceptsMouseClicks(true, false);
 
     rightThumbSlider.textFromValueFunction = [](double value)
@@ -130,10 +132,11 @@ MainComponent::MainComponent()
     rightThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(rightThumbLabel);
-    rightThumbLabel.setText("Right Thumb Movement\n(TODO)", juce::dontSendNotification);
+    rightThumbLabel.setText("Reverb", juce::dontSendNotification);
     rightThumbLabel.setJustificationType(juce::Justification::centred);
     rightThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
-    
+    rightThumbLabel.setFont(juce::Font(18.0f));
+
 
     
     // === ENVELOPE CONFIGURATION (A, S, D, R) ===
@@ -144,7 +147,7 @@ MainComponent::MainComponent()
     attackKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     attackKnob.setRange(0.0, 1.0);
     attackKnob.setValue(0.05);
-    attackKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    attackKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     attackKnob.setNumDecimalPlacesToDisplay(2);
     attackKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     attackKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
@@ -153,16 +156,17 @@ MainComponent::MainComponent()
     attackKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(attackLabel);
-    attackLabel.setText("A", juce::dontSendNotification);
+    attackLabel.setText("Attack", juce::dontSendNotification);
     attackLabel.setJustificationType(juce::Justification::centred);
     attackLabel.setColour(juce::Label::textColourId, envColor);
+    attackLabel.setFont(juce::Font(20.0f));
 
     // Decay
     addAndMakeVisible(decayKnob);
     decayKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     decayKnob.setRange(0.0, 1.0);
     decayKnob.setValue(0.4);
-    decayKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    decayKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     decayKnob.setNumDecimalPlacesToDisplay(2);
     decayKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     decayKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
@@ -171,16 +175,17 @@ MainComponent::MainComponent()
     decayKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(decayLabel);
-    decayLabel.setText("D", juce::dontSendNotification);
+    decayLabel.setText("Decay", juce::dontSendNotification);
     decayLabel.setJustificationType(juce::Justification::centred);
     decayLabel.setColour(juce::Label::textColourId, envColor);
+    decayLabel.setFont(juce::Font(20.0f));
 
     // Sustain
     addAndMakeVisible(sustainKnob);
     sustainKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     sustainKnob.setRange(0.0, 1.0);
     sustainKnob.setValue(0.6);
-    sustainKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    sustainKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     sustainKnob.setNumDecimalPlacesToDisplay(2);
     sustainKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     sustainKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
@@ -189,16 +194,17 @@ MainComponent::MainComponent()
     sustainKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(sustainLabel);
-    sustainLabel.setText("S", juce::dontSendNotification);
+    sustainLabel.setText("Sustain", juce::dontSendNotification);
     sustainLabel.setJustificationType(juce::Justification::centred);
     sustainLabel.setColour(juce::Label::textColourId, envColor);
+    sustainLabel.setFont(juce::Font(20.0f));
 
     // Release
     addAndMakeVisible(releaseKnob);
     releaseKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     releaseKnob.setRange(0.0, 1.0);
     releaseKnob.setValue(0.8);
-    releaseKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
+    releaseKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     releaseKnob.setNumDecimalPlacesToDisplay(2);
     releaseKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     releaseKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
@@ -207,9 +213,10 @@ MainComponent::MainComponent()
     releaseKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(releaseLabel);
-    releaseLabel.setText("R", juce::dontSendNotification);
+    releaseLabel.setText("Release", juce::dontSendNotification);
     releaseLabel.setJustificationType(juce::Justification::centred);
     releaseLabel.setColour(juce::Label::textColourId, envColor);
+    releaseLabel.setFont(juce::Font(20.0f));
 
     // Toggle Switches
     juce::Colour offGrey(0xff2a2d34);
@@ -250,6 +257,10 @@ MainComponent::MainComponent()
     rightThumbToggle.setColour(juce::TextButton::buttonOnColourId, juce::Colour(0xff9cb380).withAlpha(0.6f));
     rightThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
     rightThumbToggle.setToggleState(false, juce::dontSendNotification);
+
+    // Spectrum of frequency
+    addAndMakeVisible(spectrum);
+
 
     // Biomechanical Controls
     auto sendAll = [this]()
@@ -318,7 +329,7 @@ MainComponent::MainComponent()
 
 
     // Setting the size of the component after adding any child components is necessary
-    setSize(800, 600);
+    setSize(1000, 700);
 
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired(juce::RuntimePermissions::recordAudio)
@@ -452,12 +463,23 @@ void MainComponent::resized()
 
     // Split the window into three distinct vertical zones
     auto topRowArea = area.removeFromTop(area.getHeight() * 0.33f);
-    auto middleRowArea = area.removeFromTop(area.getHeight() * 0.5f);
+    auto middleRowArea = area.removeFromTop(area.getHeight() * 0.45f);
     auto bottomRowArea = area;
 
     // Save the Y-coordinate of the line that separates the knobs and sliders
     int dividingLineY = middleRowArea.getBottom();
     int centerX = getLocalBounds().getCentreX();
+
+    int spectrumHeight = 100;
+
+    auto spectrumArea = juce::Rectangle<int>(
+        40,                          // left
+        dividingLineY + 2 * 35 + 10, // sotto i toggle
+        getWidth() - 80,             // larghezza
+        spectrumHeight               // altezza
+    );
+    spectrum.setBounds(spectrumArea);
+    
 
     // Dividing top row (A, D, S, R)
     auto colWidth = topRowArea.getWidth() / 4;
@@ -466,7 +488,7 @@ void MainComponent::resized()
     auto sZone = topRowArea.removeFromLeft(colWidth);
     auto rZone = topRowArea;
 
-    int envKnobSize = 100;
+    int envKnobSize = 130;
 
     attackKnob.setBounds(aZone.withSizeKeepingCentre(envKnobSize, envKnobSize).translated(0, -10));
     attackLabel.setBounds(aZone.getX() + 10, attackKnob.getBottom(), aZone.getWidth() - 20, 30);
@@ -485,7 +507,7 @@ void MainComponent::resized()
     auto leftKnobZone = middleRowArea.removeFromLeft(middleRowArea.getWidth() * 0.5f);
     auto rightKnobZone = middleRowArea;
 
-    int mainKnobSize = 150;
+    int mainKnobSize = 200;
 
     leftHandKnob.setBounds(leftKnobZone.withSizeKeepingCentre(mainKnobSize, mainKnobSize).translated(0, -10));
     leftKnobLabel.setBounds(leftKnobZone.getX() + 10, leftHandKnob.getBottom() + 2, leftKnobZone.getWidth() - 20, 45);
@@ -498,10 +520,10 @@ void MainComponent::resized()
     auto leftSliderZone = bottomRowArea.removeFromLeft(bottomRowArea.getWidth() * 0.5f);
     auto rightSliderZone = bottomRowArea;
 
-    leftThumbSlider.setBounds(leftSliderZone.withSizeKeepingCentre(280, 50).translated(0, -10));
+    leftThumbSlider.setBounds(leftSliderZone.withSizeKeepingCentre(320, 60).translated(0, -10));
     leftThumbLabel.setBounds(leftSliderZone.getX() + 10, leftThumbSlider.getBottom() + 2, leftSliderZone.getWidth() - 20, 45);
 
-    rightThumbSlider.setBounds(rightSliderZone.withSizeKeepingCentre(280, 50).translated(0, -10));
+    rightThumbSlider.setBounds(rightSliderZone.withSizeKeepingCentre(320, 60).translated(0, -10));
     rightThumbLabel.setBounds(rightSliderZone.getX() + 10, rightThumbSlider.getBottom() + 2, rightSliderZone.getWidth() - 20, 45);
 
 
@@ -520,4 +542,6 @@ void MainComponent::resized()
 
     // Bottom-Right (Right Thumb)
     rightThumbToggle.setBounds(centerX + gap, dividingLineY + gap, btnSize, btnSize);
+
+    spectrum.setBounds(40, getHeight() - 150, getWidth() - 80, 120);
 }
