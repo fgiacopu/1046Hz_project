@@ -440,15 +440,13 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
 //==============================================================================
 void MainComponent::paint(juce::Graphics& g)
 {
-    juce::Colour topColor(0xff1a1d24);
-    juce::Colour bottomColor(0xff111317);
+    g.fillAll(juce::Colours::black);
 
-    juce::ColourGradient gradient(topColor, 0.0f, 0.0f,
-        bottomColor, 0.0f, static_cast<float>(getHeight()),
-        false);
-    g.setGradientFill(gradient);
-    g.fillAll();
+    g.setColour(juce::Colour(0x22ffffff));
+    g.drawRect(getLocalBounds(), 1);
+
 }
+
 
 void MainComponent::resized()
 {
