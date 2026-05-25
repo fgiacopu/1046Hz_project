@@ -258,9 +258,6 @@ MainComponent::MainComponent()
     rightThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
     rightThumbToggle.setToggleState(false, juce::dontSendNotification);
 
-    // Spectrum of frequency
-    addAndMakeVisible(spectrum);
-
 
     // Biomechanical Controls
     auto sendAll = [this]()
@@ -463,24 +460,13 @@ void MainComponent::resized()
 
     // Split the window into three distinct vertical zones
     auto topRowArea = area.removeFromTop(area.getHeight() * 0.33f);
-    auto middleRowArea = area.removeFromTop(area.getHeight() * 0.45f);
+    auto middleRowArea = area.removeFromTop(area.getHeight() * 0.5f);
     auto bottomRowArea = area;
 
     // Save the Y-coordinate of the line that separates the knobs and sliders
     int dividingLineY = middleRowArea.getBottom();
     int centerX = getLocalBounds().getCentreX();
-
-    int spectrumHeight = 100;
-
-    auto spectrumArea = juce::Rectangle<int>(
-        40,                          // left
-        dividingLineY + 2 * 35 + 10, // sotto i toggle
-        getWidth() - 80,             // larghezza
-        spectrumHeight               // altezza
-    );
-    spectrum.setBounds(spectrumArea);
     
-
     // Dividing top row (A, D, S, R)
     auto colWidth = topRowArea.getWidth() / 4;
     auto aZone = topRowArea.removeFromLeft(colWidth);
@@ -543,5 +529,4 @@ void MainComponent::resized()
     // Bottom-Right (Right Thumb)
     rightThumbToggle.setBounds(centerX + gap, dividingLineY + gap, btnSize, btnSize);
 
-    spectrum.setBounds(40, getHeight() - 150, getWidth() - 80, 120);
 }
