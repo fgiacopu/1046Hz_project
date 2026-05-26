@@ -1,72 +1,76 @@
-##### JUCE - Plugin Interface and Middleware
+# JUCE - Gesture Interface and OSC Middleware
 This module contains a JUCE-based audio plugin that acts as an interface and middleware
 between the gesture analysis system and the sound synthesis engine.
 
 The plugin is responsible for receiving OSC control data, smoothing and scaling
 parameters, providing a graphical user interface, and optionally applying audio effects.
 
-### Responsibilities
+## Responsibilities
 - OSC reception from external processes
 - Parameter smoothing and routing
 - Graphical user interface
 - Plugin integration (VST/AU)
 
-### Status
 ## Implemented Features
 
 - OSC message reception from Python module
 - Real‑time parsing of continuous gestural descriptors
 - Graphical visualization of gesture parameters using rotary sliders for the left and right hand openness, and linear sliders for left and right thumb movements
-- OSC forwarding to SuperCollider sound engine
+- Symmetric dual-target OSC forwarding: Concurrently syncs parameters to the SuperCollider sound engine and the Processing visualization engine
 - Allowing for manual interaction when a camera is not connected.
-- Receiving default ADSR envelope parameters from SuperCollider upon initialization
+- Receiving default ADSR envelope parameters from SuperCollider upon initialization and automatically mirroring those updates out to Processing to keep them in sync
 - Enabling, disabling selectively the incoming biomechanical data streams via a 2x2 grid of GUI toggle switches
 - Standalone GUI application for testing and debugging
 
 
-### OSC Interface
-## Inputs (listening on port 9000)
-# From Python (Biomechanical Data):
+## OSC Interface
+### Inputs (listening on port 9000)
+#### From Python (Biomechanical Data):
 Continuous float value in range [0.0 – 1.0]
 
-- `/hand/left/open`: Represents the openness of the left hand and is mapped to low pass filter cut off
+- `/hand/left/open`: Represents the openness of the left hand (mapped to low pass filter cutoff: 200 Hz - 8000 Hz exponentially)
 
-- `/hand/right/open`: Represents the openness of the right hand and is mapped to chorus
+- `/hand/right/open`: Represents the openness of the right hand (mapped to chorus percentage)
 
-- `/hand/left/thumb`: Represents the movement of the left thumb and is mapped to flanger
+- `/hand/left/thumb`: Represents the movement of the left thumb (mapped to flanger percentage)
 
-- `/hand/right/thumb`: Represents the movement of the right thumb and is mapped to !!!!TODO!!!!
+- `/hand/right/thumb`: Represents the movement of the right thumb (mapped to distortion percentage)
 
-# From SuperCollider (Envelope Deafults):
-Float values to synchronize GUI on startup
+#### From SuperCollider (Envelope Defaults):
+Float values to synchronize GUI on startup. When received, these values update the UI layout on the main message thread and are immediately broadcast out to Processing.
 - /attack
 - /decay
 - /sustaain
 - /releasee
 
-## Output to SuperCollider (Sending to Port 57120)
+### Outputs (Forwarding Streams)
+#### To SuperCollider (Port 57130)
 - Direct forwarding of the four /hand/... biomechanical parameters (if the corresponding UI toggle switch is active)
+- Real-time forwarding of manual UI adjustments to /attack, /decay, /sustaain, and /releasee values
+
+#### To Processing (Port 9001)
+- Symmetric duplication of all outgoing /hand/... biomechanical parameters (gated by the toggle grid).
+- Real-time, thread-safe mirroring of /attack, /decay, /sustaain, and /releasee values (triggered by either direct UI manipulation or incoming SuperCollider sync changes).
 
 
-### Functional Description
+## Functional Description
 The JUCE module performs three main operations:
 
-## 1. Data Reception
+### 1. Data Reception
 - Listens for OSC messages on port `9000`
 - Receives real‑time gesture data from Python and initialization data from SuperCollider
 - Operates asynchronously with respect to the GUI and audio threads
 
-## 2. Control Processing and Visualization
+### 2. Control Processing and Visualization
 - Extracts and validates incoming float values  
-- Updates GUI elements (rotary knobs for hands, linear sliders for thumbs, rotary knobs for ADSR) to reflect the current state  
-- Ensures thread safety when interacting with UI components  
+- Updates GUI elements (rotary knobs for hands, linear sliders for thumbs, rotary knobs for ADSR) to reflect the current state safely on the main thread  
+- Maps raw [0.0 - 1.0] floats to user-friendly text representations (e.g., exponential Hz calculations for the LPF cutoff knob, percentage labels for modulations)
 
-## 3. Parameter Forwarding
+### 3. Parameter Forwarding
 - Checks the state of the biomechanical toggle switches
-- If a channel is active, the value is forwarded via OSC to SuperCollider (127.0.0.1:57120); if disabled, the OSC message is blocked
-- Enables real‑time mapping between gesture descriptors and sound synthesis parameters
+- If a channel is active, the value is forwarded via OSC to SuperCollider (127.0.0.1:57130) and Processing (127.0.0.1:9001); if a toggle is disabled, incoming stream updates are blocked, and an explicit 0.0f value is transmitted instead to safely rest the external engines
 
-### Execution
+## Execution
 
 The JUCE module is implemented as a standalone GUI application.
 
@@ -77,33 +81,25 @@ To run the application:
 3. Build and run the application  
 
 Once running:
-- The GUI displays controls of different colors (blue for left, green for right and purple for envelopes) 
-- OSC messages are received in real time from Python and SuperCollider,  also the processed messages received from Python are sent to SuperCollider
-- Users can manually control the synth via the GUI or toggle inputs on/off to let the camera drive the sound.
+- Smart Window Sizing: The application boots into a custom-configured MainWindow geometry. It dynamically calculates your primary display's userArea bounds to stretch the window vertically from the absolute top to the absolute bottom of the screen (respecting native OS taskbars and docks), while locking the width to its intentional 1000-pixel footprint and centering itself horizontally.
+- The GUI displays high-contrast control segments (Blue for Left Hand, Green for Right Hand, Purple for ADSR).
+- Users can toggle inputs off via the 2x2 center grid to bypass camera control and tweak synthesis parameters manually.
 
-### Code Structure
+## Code Structure
 
 - `Main.cpp`  
-  Automatically generated by Projucer.  
-  Acts as the application entry point:
-  - creates the main application window  
-  - initializes the JUCE framework  
-  - instantiates the `MainComponent`  
-    (This file is usually not modified, as it handles the basic application lifecycle.)
+  Acts as the application entry point. Implements GUIApplication and its embedded MainWindow class:
+  Initializes the JUCE framework application lifecycle.
+  Interrogates juce::Desktop::getInstance().getDisplays() to calculate available desktop heights.
+  Dynamically calculates coordinates to lock window width while filling out the screen space vertically all the way to the bottom.
+  Instantiates the MainComponent.
 
 - `MainComponent.h`  
-  Defines the main component class:
-  - OSC interfaces (`OSCReceiver`, `OSCSender`)
-  - GUI elements (sliders, labels, buttons)
-  - method declarations
+  Defines the primary component class layout, declaring OSCReceiver interfaces, distinct OSCSender objects targeting SuperCollider and Processing independently, labels, buttons, and slider components.
 
 - `MainComponent.cpp`  
-  Implements:
-  - GUI setup and styling
-  - OSC communication and flow-control
-  - parameter processing
-  - thread‑safe updates
-  - forwarding to SuperCollider
+  Implements the core logic: UI color styling, dynamic area partitioning layouts inside resized(), and incoming network filtering.
+
 
 ## Implementation Details
 
@@ -137,6 +133,7 @@ From SuperCollider (Envelope deafults):
 
 ### Message Validation
 Before accessing the data, the system performs validation checks:
+
 ```cpp
 if (message.size() > 0 && message[0].isFloat32())
 ```
@@ -169,27 +166,66 @@ handKnob.setInterceptsMouseClicks(true, false);
 ```
 This hybrid approach ensures that the GUI provides visual feedback for the camera's gesture control, while still allowing the user to manually click and drag the parameters if they want to play the synth without a camera connected.
 
-
-### Thread-Safe GUI Updates
-OSC callbacks run asynchronously on a background network thread. To safely update the graphical interface without causing UI freezes or crashes, the system pushes updates to the main message thread:
-
-```cpp
-juce::MessageManager::callAsync([this, val, pattern]() {
-    leftHandKnob.setValue(val, juce::dontSendNotification);
-```
-
-This is essential to avoid race conditions and crashes in real‑time audio applications.
-
-
-### OSC Forwarding
-After processing the biomechanical inputs, the gesture values are routed back out to SuperCollider:
+### Initialization Notification Trick
+Because custom textFromValueFunction lambda strings are only evaluated when a value changes, the UI executes a synchronous fake notification on startup to force the labels to render text properly (e.g., showing "200 Hz" or "0 %" right away instead of empty spaces):
 
 ```cpp
-sender.connect("127.0.0.1", 57120);
-sender.send("/hand/left/open", val);
+leftHandKnob.setValue(0.0, juce::sendNotificationSync);
+leftHandKnob.setValue(0.000001, juce::dontSendNotification);
+leftHandKnob.setValue(0.0, juce::sendNotificationSync);
 ```
 
-This establishes the final link in the middleware chain, creating a direct, real-time mapping between the user's physical gesture input and SuperCollider's sound parameters.
+This hybrid configuration ensures that the GUI provides an immediate, user-friendly visualization layout while preserving manual click-and-drag interactions.
+
+### Thread-Safe Architecture & Processing Sync
+Because incoming network signals run asynchronously on a background network thread, the system isolates GUI component modification from network transmission to guarantee stability.
+
+When external ADSR parameters update, they are scheduled cleanly onto the main thread execution block while keeping the visual rendering engine completely up to date, simultaneously mirroring the packet directly to Processing:
+
+```cpp
+if (pattern == "/attack" || pattern == "/decay" || pattern == "/sustaain" || pattern == "/releasee")
+{
+    juce::MessageManager::callAsync([this, val, pattern]() {
+        processingSender.send(pattern, val);
+
+        if (pattern == "/attack")
+            attackKnob.setValue(val, juce::dontSendNotification);
+        else if (pattern == "/decay")
+            decayKnob.setValue(val, juce::dontSendNotification);
+        else if (pattern == "/sustaain")
+            sustainKnob.setValue(val, juce::dontSendNotification);
+        else if (pattern == "/releasee")
+            releaseKnob.setValue(val, juce::dontSendNotification);
+    });
+
+    return;
+}
+```
+
+This asynchronous handoff is essential to avoid race conditions and desktop thread lockups in real‑time audio applications.
+
+### Biomechanical Routing Logic
+When structural adjustments are driven directly from the physical tracking camera, the system passes parameter changes through a functional gate mapping to all active network recipients instantly.
+
+If the tracking stream is globally active via the toggle matrix, data is forwarded symmetrically to both SuperCollider and Processing before updating the physical UI layout:
+
+```cpp
+if (shouldProcess)
+{
+    // Forwarding to SuperCollider and Processing concurrently
+    sender.send(pattern, val);
+    processingSender.send(pattern, val);
+
+    // Update UI safely on the main Thread
+    juce::MessageManager::callAsync([this, val, pattern]() {
+        if (pattern == "/hand/left/open")
+            leftHandKnob.setValue(val, juce::dontSendNotification);
+        // ... Repeated for other biomechanical targets ...
+    });
+}
+```
+
+This establishes the final link in the middleware chain, creating a direct, real-time mapping between the user's physical gesture input and external engines.
 
 ### Dynamic Layout and Styling
 Instead of relying on hardcoded coordinates, the interface layout and component sizing are calculated dynamically within the `resized()` method. The UI partitions the window into relative semantic zones (Envelopes, Hands, Thumbs, and a centralized Toggle grid) ensuring the interface scales cleanly, remains symmetrical, and keeps related controls visually grouped.
@@ -208,5 +244,3 @@ void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
 Although the JUCE module does not generate sound itself (operating entirely at the control rate while SuperCollider handles audio-rate synthesis), the project was purposefully built using JUCE's Audio Application template rather than a standard GUI Application.
 
 This provides forward-thinking scalability: the underlying audio thread and device manager are already fully configured in case the DSP and synthesis engines are ported directly into JUCE for a future standalone release.
-
-
