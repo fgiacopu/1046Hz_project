@@ -132,7 +132,7 @@ MainComponent::MainComponent()
     rightThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(rightThumbLabel);
-    rightThumbLabel.setText("Reverb", juce::dontSendNotification);
+    rightThumbLabel.setText("Distortion", juce::dontSendNotification);
     rightThumbLabel.setJustificationType(juce::Justification::centred);
     rightThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
     rightThumbLabel.setFont(juce::Font(18.0f));
@@ -262,17 +262,30 @@ MainComponent::MainComponent()
     // Biomechanical Controls
     auto sendAll = [this]()
         {
-            sender.send("/hand/left/open", static_cast<float>(leftHandKnob.getValue()));
-            sender.send("/hand/right/open", static_cast<float>(rightHandKnob.getValue()));
-            sender.send("/hand/left/thumb", static_cast<float>(leftThumbSlider.getValue()));
-            sender.send("/hand/right/thumb", static_cast<float>(rightThumbSlider.getValue()));
+            float leftOpen = static_cast<float>(leftHandKnob.getValue());
+            float rightOpen = static_cast<float>(rightHandKnob.getValue());
+            float leftThumb = static_cast<float>(leftThumbSlider.getValue());
+            float rightThumb = static_cast<float>(rightThumbSlider.getValue());
+
+            sender.send("/hand/left/open", leftOpen);
+            sender.send("/hand/right/open", rightOpen);
+            sender.send("/hand/left/thumb", leftThumb);
+            sender.send("/hand/right/thumb", rightThumb);
+
+            processingSender.send("/hand/left/open", leftOpen);
+            processingSender.send("/hand/right/open", rightOpen);
+            processingSender.send("/hand/left/thumb", leftThumb);
+            processingSender.send("/hand/right/thumb", rightThumb);
         };
 
     // Toggle
     leftHandToggle.onClick = [this, sendAll]()
         {
             if (!leftHandToggle.getToggleState())
+            {
                 sender.send("/hand/left/open", 0.0f);
+                processingSender.send("/hand/left/open", 0.0f);
+            }
 
             sendAll();
         };
@@ -280,7 +293,10 @@ MainComponent::MainComponent()
     rightHandToggle.onClick = [this, sendAll]()
         {
             if (!rightHandToggle.getToggleState())
+            {
                 sender.send("/hand/right/open", 0.0f);
+                processingSender.send("/hand/right/open", 0.0f);
+            }
 
             sendAll();
         };
@@ -288,7 +304,10 @@ MainComponent::MainComponent()
     leftThumbToggle.onClick = [this, sendAll]()
         {
             if (!leftThumbToggle.getToggleState())
+            {
                 sender.send("/hand/left/thumb", 0.0f);
+                processingSender.send("/hand/left/thumb", 0.0f);
+            }
 
             sendAll();
         };
@@ -296,7 +315,10 @@ MainComponent::MainComponent()
     rightThumbToggle.onClick = [this, sendAll]()
         {
             if (!rightThumbToggle.getToggleState())
+            {
                 sender.send("/hand/right/thumb", 0.0f);
+                processingSender.send("/hand/right/thumb", 0.0f);
+            }
 
             sendAll();
         };
@@ -309,19 +331,27 @@ MainComponent::MainComponent()
 
     // ADSR Envelope Controls
     attackKnob.onValueChange = [this]() {
-        sender.send("/attack", static_cast<float>(attackKnob.getValue()));
+        float val = static_cast<float>(attackKnob.getValue());
+        sender.send("/attack", val);
+        processingSender.send("/attack", val);
         };
 
     decayKnob.onValueChange = [this]() {
-        sender.send("/decay", static_cast<float>(decayKnob.getValue()));
+        float val = static_cast<float>(decayKnob.getValue());
+        sender.send("/decay", val);
+        processingSender.send("/decay", val);
         };
 
     sustainKnob.onValueChange = [this]() {
-        sender.send("/sustaain", static_cast<float>(sustainKnob.getValue()));
+        float val = static_cast<float>(sustainKnob.getValue());
+        sender.send("/sustaain", val);
+        processingSender.send("/sustaain", val);
         };
 
     releaseKnob.onValueChange = [this]() {
-        sender.send("/releasee", static_cast<float>(releaseKnob.getValue()));
+        float val = static_cast<float>(releaseKnob.getValue());
+        sender.send("/releasee", val);
+        processingSender.send("/releasee", val);
         };
 
 
@@ -342,7 +372,9 @@ MainComponent::MainComponent()
 
         receiver.connect(9000); //Listen to Python
         receiver.addListener(this); //This class handles the data
+        
         sender.connect("127.0.0.1", 57130); //Forwording to SC
+        processingSender.connect("127.0.0.1", 9001); //Forwarding to Processing
     }
 }
 
@@ -419,8 +451,9 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
 
         if (shouldProcess)
         {
-            // Forwarding to SuperCollider
+            // Forwarding to SuperCollider and Processing
             sender.send(pattern, val);
+            processingSender.send(pattern, val);
 
             // Update UI safely on the main Thread
             juce::MessageManager::callAsync([this, val, pattern]() {

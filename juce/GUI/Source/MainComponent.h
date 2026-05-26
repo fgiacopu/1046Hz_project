@@ -31,6 +31,7 @@ private:
     //==============================================================================
     juce::OSCReceiver receiver;
     juce::OSCSender sender;
+    juce::OSCSender processingSender;
 
     // Left Hand (Openness)
     juce::Slider leftHandKnob;
