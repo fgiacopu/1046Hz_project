@@ -427,6 +427,8 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
         if (pattern == "/attack" || pattern == "/decay" || pattern == "/sustaain" || pattern == "/releasee")
         {
             juce::MessageManager::callAsync([this, val, pattern]() {
+                processingSender.send(pattern, val);
+
                 if (pattern == "/attack")
                     attackKnob.setValue(val, juce::dontSendNotification);
                 else if (pattern == "/decay")

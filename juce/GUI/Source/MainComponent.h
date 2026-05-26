@@ -45,7 +45,7 @@ private:
     juce::Slider leftThumbSlider;
     juce::Label leftThumbLabel;
 
-    // Right Thumb (????)
+    // Right Thumb (Distortion)
     juce::Slider rightThumbSlider;
     juce::Label rightThumbLabel;
 
