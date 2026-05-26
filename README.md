@@ -1,4 +1,4 @@
-# 1046Hz - CMLS project (a.y. 2025/2026)
+# SY - CMLS project (a.y. 2025/2026)
 Gesture‑controlled synthesizer project developed for the _Computer Music: Languages and Systems_ course (a.y. 2025-2026).
 
 ## Purpose of the project
@@ -7,7 +7,6 @@ The core idea is to combine gesture recognition, real‑time parameter control, 
 The project integrates multiple technologies commonly used in computer music systems:
 
 ## System Overview
-
 The system is composed of multiple modular components that communicate in real time:
 
 - Python is used for real-time gesture analysis and data processing.
@@ -17,27 +16,31 @@ The system is composed of multiple modular components that communicate in real t
 
 Overall, the system is designed to support real-time responsiveness, modular development, and a clear separation between sensing (Python), control (JUCE), sound generation (SuperCollider), and visual feedback (Processing).
 
-
 ## Technologies Used
 - Python (MediaPipe, OSC communication)
 - JUCE (C++ GUI Audio Application)
-- SuperCollider (real-time sound synthesis)
+- SuperCollider (real-time sound and effects synthesis)
 - OSC (Open Sound Control protocol)
-- Processing (real-time graphical visualisation and visual feedback)
+- Processing (real-time graphical representation for visual feedback)
 
 ## Project Outcome
 This repository presents a fully functional prototype of a gesture-controlled musical instrument for real-time interaction.
 
 - The system integrates gesture tracking, control interface, sound synthesis, and visual feedback into a coherent pipeline.
 - Real-time communication between modules is stable and reliably managed through OSC.
-- The JUCE interface supports both manual interaction and gesture-based control.
+- The JUCE interface supports both manual interaction and gesture-based 
+control.
+<p align="center">
+ <img src="images/showcase_GUI.png" width="400">
+
 - The SuperCollider engine enables dynamic sound synthesis and audio processing.
-- The Processing module provides continuous visual feedback linked to both gesture data and audio parameters.
+- The Processing module provides continuous visual feedback linked to both gesture data and audio parameters. 
+<p align="center">
+<img src="images/showcase_processing.gif" width="400">
+
 - The system can be launched reliably through a structured startup sequence, ensuring correct initialization of all components.
 
 The project demonstrates a complete and modular interactive system, combining sensing, control, sound generation, and visualisation into a unified real-time experience.
-
-
 
 ## System Architecture and Data Flow
 
@@ -47,16 +50,16 @@ The system operates through real-time communication between independent modules:
 - The extracted parameters (e.g. hand openness, thumb position) are sent via OSC.
 - JUCE receives and optionally modifies control data through its GUI interface.
 - SuperCollider receives control messages and performs sound synthesis and processing.
-- Relevant audio or control parameters are sent to Processing via OSC to generate visual feedback.
+- Relevant audio or control parameters (from both JUCE GUI or supercollider) are sent to Processing via OSC to generate visual feedback.
 
 This modular architecture enables flexible communication and clear separation between sensing, control, audio, and visualisation layers.
 
 ## How to Run
-1. Ensure dependencies are installed:
+1. Ensure dependencies are installed and source code is built before starting the system:
    - Python environment with required libraries (see `python/environment.yml`)
    - SuperCollider
    - JUCE application built for your system
-   - Processing (for real-time visualisation)
+   - Processing (for real-time visualisation) built in the right folder
 
 2. Launch the system: `start_system.bat`
 
@@ -73,75 +76,16 @@ Make sure to manually run the Processing sketch to enable real-time graphical fe
 
 ### Startup sequence:
 1. SuperCollider is launched first to ensure exclusive MIDI access.
-2. The JUCE application is launched.
-3. JUCE automatically starts the Python gesture‑tracking engine as a headless background process.
-4. The Processing sketch is started to display real-time visual feedback.
+2. Python hand tracking component is launched.
+3. The JUCE application is launched.
+4. The Processing executable is started to display real-time visual feedback.
 
-This approach guarantees both modular standalone operation and stable integrated
-execution, favoring robustness, reproducibility, and clear separation of system
-responsibilities.
-
+This approach guarantees both modular standalone operation and stable integrated execution, favoring robustness, reproducibility, and clear separation of system responsibilities.
 
 ## Group Members
-Lorenzo Corna \
-Anitha Sivasankar \
-Tekla Gizella Kalmár \
-Eleonora Berra \
-Federico Giacopuzzi \
-Antonio Treviglio
-
-## Contributing
-
-This project is developed collaboratively by multiple team members.
-To ensure a clean and stable workflow, all contributors must follow the
-guidelines below.
-
-### Branching Strategy
-
-- `main`   
-    Contains only stable and verified versions of the project.  
-    No direct commits or pushes are allowed.
-
-- `development`  
-    Acts as a shared integration branch where the different sections
-    (Python, JUCE, SuperCollider) are combined and tested together.
-
-- Section branches  
-    Each main component is developed on a dedicated branch:
-    - `python`
-    - `juce`
-    - `supercollider`
-
-### Keeping Your Branch Updated
-To integrate changes merged by others into development:
-```bash
-git checkout python
- git restore --source origin/development -- python/
-```
-This:
-- updates your branch with the latest integrated work in the development
-- does not affect `main`
-
-### Workflow
-
-1. Switch to your section branch:
-```bash
-git checkout python
-```
-
-2. Develop and commit changes:
-```bash
-git add .
-git commit -m "feat: clear description of the change"
-```
-
-3. Push to your section branch:
-```bash
-git push
-```
-
-### Final Merge
-When the entire project works correctly in development, open a Pull Request:\
-base: `main` compare: `development`
-
-Use `Squash and merge` to keep the `main` history clean and readable.
+Lorenzo Corna (Supercollider)\
+Anitha Sivasankar (Supercollider) \
+Tekla Gizella Kalmár (JUCE) \
+Eleonora Berra (JUCE) \
+Federico Giacopuzzi (Processing) \
+Antonio Treviglio (Python)
