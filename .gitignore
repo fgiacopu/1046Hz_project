@@ -9,11 +9,3 @@ desktop.ini
 
 # Processing build (export)
 processing/windows-amd64/
-
-# Development READMEs
-*/README.md
-!README.md
-
-# Testing .bats
-*/*.bat
-!*.bat
