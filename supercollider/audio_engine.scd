@@ -84,25 +84,19 @@ s.waitForBoot({
 
         signal = XFade2.ar(signal, chorusSignal, chorusMix.linlin(0, 1, -1, 1));
 
-        // DISTORSIONE AGGRESSIVA
+		  // DISTORTION
         drive = distAmount;
 
-        // 1. pre-gain molto forte
         distorted = signal * (drive * 2);
 
-        // 2. saturazione base
         distorted = tanh(distorted);
 
-        // 3. STAGE HARD (più cattivo)
         distorted = (distorted * 3).clip2(0.7);
 
-        // 4. folding leggero (più armoniche)
         distorted = (distorted * 1.5).fold2(0.8);
 
-        // 5. filtro per controllare asprezza
         distorted = LPF.ar(distorted, cutoffCtrl * 1.3);
 
-        // mix più deciso
         signal = XFade2.ar(
             signal,
             distorted,
@@ -187,7 +181,7 @@ s.waitForBoot({
             cDepth = right;
             cRate  = right.linexp(0, 1, 0.08, 0.3);
 
-            // DIST PESANTE
+            // DIST
             dMix = rThumb.pow(0.8);
             dAmt = rThumb.linexp(0, 1, 1, 12);
 
