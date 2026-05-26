@@ -1,4 +1,4 @@
-# SY - CMLS project (a.y. 2025/2026)
+# SYNTHAND - CMLS project (a.y. 2025/2026)
 Gesture‑controlled synthesizer project developed for the _Computer Music: Languages and Systems_ course (a.y. 2025-2026).
 
 ## Purpose of the project
