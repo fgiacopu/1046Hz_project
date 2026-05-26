@@ -1,8 +1,8 @@
-# SYNTHAND - CMLS project (a.y. 2025/2026)
+# SYNTHANDS - CMLS project (a.y. 2025/2026)
 Gesture‑controlled synthesizer project developed for the _Computer Music: Languages and Systems_ course (a.y. 2025-2026).
 
 ## Purpose of the project
-This project aims to design and prototype an expressive gesture‑controlled digital musical instrument that enables real‑time sound interaction without physical contact. The system explores how hand movements, captured through a standard webcam and analyzed via computer‑vision techniques, can be mapped to sound synthesis and audio effects parameters.
+The SYNTHANDS project aims to design and prototype an expressive gesture‑controlled digital musical instrument that enables real‑time sound interaction without physical contact. The system explores how hand movements, captured through a standard webcam and analyzed via computer‑vision techniques, can be mapped to sound synthesis and audio effects parameters.
 The core idea is to combine gesture recognition, real‑time parameter control, and digital sound synthesis into a modular and extensible system. Hand gestures are translated into continuous control data, which are then used to shape timbre, dynamics, and effects in a sound engine. This approach emphasizes expressivity, physicality, and experimentation beyond traditional controllers such as keyboards or MIDI devices.
 The project integrates multiple technologies commonly used in computer music systems:
 
@@ -14,7 +14,7 @@ The system is composed of multiple modular components that communicate in real t
 - SuperCollider is used as the main sound synthesis and audio processing engine.
 - Processing is used as a graphical feedback unit, delivering an intuitive and dynamic visual representation of the interaction and sound processes.
 
-Overall, the system is designed to support real-time responsiveness, modular development, and a clear separation between sensing (Python), control (JUCE), sound generation (SuperCollider), and visual feedback (Processing).
+Overall, the system is designed to support real-time responsiveness, modular development, and a clear separation between an interaction system (Python), a computer music unit (JUCE as a GUI with Supercollider as audio engine) and graphical feedback (Processing).
 
 ## Technologies Used
 - Python (MediaPipe, OSC communication)
