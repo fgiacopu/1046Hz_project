@@ -7,36 +7,56 @@ The core idea is to combine gesture recognition, real‑time parameter control, 
 The project integrates multiple technologies commonly used in computer music systems:
 
 ## System Overview
+
 The system is composed of multiple modular components that communicate in real time:
 
 - Python is used for real-time gesture analysis and data processing.
-- A JUCE-based plugin acts as an interface and middleware layer.
+- A JUCE-based application acts as an interface and middleware layer, enabling user control and forwarding parameters between modules.
 - SuperCollider is used as the main sound synthesis and audio processing engine.
+- Processing is used as a graphical feedback unit, delivering an intuitive and dynamic visual representation of the interaction and sound processes.
 
-An optional hardware extension may be explored to incorporate simple physiological sensing (e.g. heart rate) as an additional expressive control dimension. This extension is considered secondary to the main vision-based interaction and may not be included in the final version.
+Overall, the system is designed to support real-time responsiveness, modular development, and a clear separation between sensing (Python), control (JUCE), sound generation (SuperCollider), and visual feedback (Processing).
 
-Overall, the system is designed to support real-time responsiveness, modular development, and a clear separation between sensing, control, and sound generation.
 
 ## Technologies Used
 - Python (MediaPipe, OSC communication)
-- JUCE (C++ audio plugin framework)
+- JUCE (C++ GUI Audio Application)
 - SuperCollider (real-time sound synthesis)
 - OSC (Open Sound Control protocol)
-- Optional: Arduino (physiological sensing extension)
+- Processing (real-time graphical visualisation and visual feedback)
 
-## Development Status
-This repository contains a working prototype of the system.
+## Project Outcome
+This repository presents a fully functional prototype of a gesture-controlled musical instrument for real-time interaction.
 
-- Core architecture is defined.
-- Gesture tracking, OSC communication, and sound synthesis are functional.
-- System startup and component orchestration are stable.
-- Further refinements and expressive mappings are ongoing
+- The system integrates gesture tracking, control interface, sound synthesis, and visual feedback into a coherent pipeline.
+- Real-time communication between modules is stable and reliably managed through OSC.
+- The JUCE interface supports both manual interaction and gesture-based control.
+- The SuperCollider engine enables dynamic sound synthesis and audio processing.
+- The Processing module provides continuous visual feedback linked to both gesture data and audio parameters.
+- The system can be launched reliably through a structured startup sequence, ensuring correct initialization of all components.
+
+The project demonstrates a complete and modular interactive system, combining sensing, control, sound generation, and visualisation into a unified real-time experience.
+
+
+
+## System Architecture and Data Flow
+
+The system operates through real-time communication between independent modules:
+
+- Gesture data is captured via webcam and processed in Python using MediaPipe.
+- The extracted parameters (e.g. hand openness, thumb position) are sent via OSC.
+- JUCE receives and optionally modifies control data through its GUI interface.
+- SuperCollider receives control messages and performs sound synthesis and processing.
+- Relevant audio or control parameters are sent to Processing via OSC to generate visual feedback.
+
+This modular architecture enables flexible communication and clear separation between sensing, control, audio, and visualisation layers.
 
 ## How to Run
 1. Ensure dependencies are installed:
    - Python environment with required libraries (see `python/environment.yml`)
    - SuperCollider
    - JUCE application built for your system
+   - Processing (for real-time visualisation)
 
 2. Launch the system: `start_system.bat`
 
@@ -47,11 +67,15 @@ Each module of the system is designed to function independently in standalone mo
 - The Python gesture‑tracking engine can be executed on its own for development and testing of computer‑vision algorithms.
 - The JUCE application can run standalone as a graphical control interface, even in the absence of the Python backend.
 - The SuperCollider sound engine can be launched independently for sound design, synthesis development, and MIDI testing.
+- The Processing sketch can be run independently to test and develop visual feedback behaviours.
+
+Make sure to manually run the Processing sketch to enable real-time graphical feedback during the system execution.
 
 ### Startup sequence:
 1. SuperCollider is launched first to ensure exclusive MIDI access.
 2. The JUCE application is launched.
 3. JUCE automatically starts the Python gesture‑tracking engine as a headless background process.
+4. The Processing sketch is started to display real-time visual feedback.
 
 This approach guarantees both modular standalone operation and stable integrated
 execution, favoring robustness, reproducibility, and clear separation of system
