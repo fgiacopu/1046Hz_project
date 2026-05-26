@@ -25,11 +25,13 @@ public:
     //==============================================================================
     void paint(juce::Graphics& g) override;
     void resized() override;
+    
 
 private:
     //==============================================================================
     juce::OSCReceiver receiver;
     juce::OSCSender sender;
+    juce::OSCSender processingSender;
 
     // Left Hand (Openness)
     juce::Slider leftHandKnob;
@@ -43,7 +45,7 @@ private:
     juce::Slider leftThumbSlider;
     juce::Label leftThumbLabel;
 
-    // Right Thumb (????)
+    // Right Thumb (Distortion)
     juce::Slider rightThumbSlider;
     juce::Label rightThumbLabel;
 
@@ -66,6 +68,6 @@ private:
     juce::Slider releaseKnob;
     juce::Label releaseLabel;
 
-
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

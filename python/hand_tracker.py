@@ -24,7 +24,7 @@ class HandTracker:
         self.window_name = "Hand Tracker"
         cv2.namedWindow(self.window_name, cv2.WINDOW_AUTOSIZE)
         self.window_positioned = False
-        self.display_size = 320  # size of the longer side
+        self.display_size = 540  # size of the longer side
 
         # MediaPipe
         self.mp_hands = mp.solutions.hands
@@ -80,9 +80,9 @@ class HandTracker:
 
         root.destroy()
 
-        margin = 20
-        x = max(0, screen_w - self.display_w - margin)
-        y = margin
+        margin = 0
+        x = max(0, screen_w - self.display_w- 10)
+        y = 0
 
         cv2.moveWindow(self.window_name, x, y)
 

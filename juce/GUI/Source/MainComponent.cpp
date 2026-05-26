@@ -7,7 +7,8 @@ MainComponent::MainComponent()
     addAndMakeVisible(leftHandKnob);
     leftHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     leftHandKnob.setRange(0.0, 1.0);
-    leftHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    leftHandKnob.setValue(0.0);
+    leftHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     leftHandKnob.setInterceptsMouseClicks(true, false);
 
     leftHandKnob.textFromValueFunction = [](double value)
@@ -20,6 +21,12 @@ MainComponent::MainComponent()
             return juce::String((int)freq) + " Hz";
         };
 
+    // Fake change to trigger the textFromValueFunction and update the display to show "200 Hz" at startup
+    leftHandKnob.setValue(0.0, juce::sendNotificationSync);
+    leftHandKnob.setValue(0.000001, juce::dontSendNotification);
+    leftHandKnob.setValue(0.0, juce::sendNotificationSync);
+
+
     // Blue - Glasslike Colors
     leftHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff00a8b5).withAlpha(0.12f)); // Frosted glass ring
     leftHandKnob.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(0xff00a8b5).withAlpha(0.6f));    // Glass fill tint
@@ -28,16 +35,18 @@ MainComponent::MainComponent()
     leftHandKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(leftKnobLabel);
-    leftKnobLabel.setText("Left Hand Openness\n(Cut-off Frequency of Low Pass Filter)", juce::dontSendNotification);
+    leftKnobLabel.setText("LPF Cutoff", juce::dontSendNotification);
     leftKnobLabel.setJustificationType(juce::Justification::centred);
     leftKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
+    leftKnobLabel.setFont(juce::Font(18.0f));
 
 
 
     addAndMakeVisible(leftThumbSlider);
     leftThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     leftThumbSlider.setRange(0.0, 1.0);
-    leftThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    leftThumbSlider.setValue(0.0);
+    leftThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     leftThumbSlider.setInterceptsMouseClicks(true, false);
 
     leftThumbSlider.textFromValueFunction = [](double value)
@@ -46,6 +55,11 @@ MainComponent::MainComponent()
             return juce::String(percentage) + " %";
         };
 
+    // Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    leftThumbSlider.setValue(0.0, juce::sendNotificationSync);
+    leftThumbSlider.setValue(0.000001, juce::dontSendNotification);
+    leftThumbSlider.setValue(0.0, juce::sendNotificationSync);
+
     // Blue - Glasslike Slider Colors
     leftThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff00a8b5).withAlpha(0.6f));          // Smoked glass track
     leftThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff77e4d4));                          // Glass handle
@@ -53,9 +67,10 @@ MainComponent::MainComponent()
     leftThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(leftThumbLabel);
-    leftThumbLabel.setText("Left Thumb Movement\n(Flanger)", juce::dontSendNotification);
+    leftThumbLabel.setText("Flanger", juce::dontSendNotification);
     leftThumbLabel.setJustificationType(juce::Justification::centred);
     leftThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff77e4d4));
+    leftThumbLabel.setFont(juce::Font(18.0f));
 
 
 
@@ -63,7 +78,8 @@ MainComponent::MainComponent()
     addAndMakeVisible(rightHandKnob);
     rightHandKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     rightHandKnob.setRange(0.0, 1.0);
-    rightHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    rightHandKnob.setValue(0.0);
+    rightHandKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     rightHandKnob.setInterceptsMouseClicks(true, false);
 
     rightHandKnob.textFromValueFunction = [](double value)
@@ -71,6 +87,11 @@ MainComponent::MainComponent()
             int percentage = value * 100.0;
             return juce::String(percentage) + " %";
         };
+
+    // Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    rightHandKnob.setValue(0.0, juce::sendNotificationSync);
+    rightHandKnob.setValue(0.000001, juce::dontSendNotification);
+    rightHandKnob.setValue(0.0, juce::sendNotificationSync);
 
     // Green - Glasslike Colors
     rightHandKnob.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(0xff4a7c59).withAlpha(0.12f)); // Frosted glass ring
@@ -80,16 +101,17 @@ MainComponent::MainComponent()
     rightHandKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(rightKnobLabel);
-    rightKnobLabel.setText("Right Hand Openness\n(Chorus)", juce::dontSendNotification);
+    rightKnobLabel.setText("Chorus", juce::dontSendNotification);
     rightKnobLabel.setJustificationType(juce::Justification::centred);
     rightKnobLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
-
+    rightKnobLabel.setFont(juce::Font(18.0f));
 
 
     addAndMakeVisible(rightThumbSlider);
     rightThumbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     rightThumbSlider.setRange(0.0, 1.0);
-    rightThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    rightThumbSlider.setValue(0.0);
+    rightThumbSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
     rightThumbSlider.setInterceptsMouseClicks(true, false);
 
     rightThumbSlider.textFromValueFunction = [](double value)
@@ -98,6 +120,11 @@ MainComponent::MainComponent()
             return juce::String(percentage) + " %";
         };
 
+    // Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    rightThumbSlider.setValue(0.0, juce::sendNotificationSync);
+    rightThumbSlider.setValue(0.000001, juce::dontSendNotification);
+    rightThumbSlider.setValue(0.0, juce::sendNotificationSync);
+
     // Green - Glasslike Slider Colors
     rightThumbSlider.setColour(juce::Slider::trackColourId, juce::Colour(0xff4a7c59).withAlpha(0.6f));          // Smoked glass track
     rightThumbSlider.setColour(juce::Slider::thumbColourId, juce::Colour(0xff9cb380));                            // Glass handle
@@ -105,12 +132,13 @@ MainComponent::MainComponent()
     rightThumbSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(rightThumbLabel);
-    rightThumbLabel.setText("Right Thumb Movement\n(TODO)", juce::dontSendNotification);
+    rightThumbLabel.setText("Distortion", juce::dontSendNotification);
     rightThumbLabel.setJustificationType(juce::Justification::centred);
     rightThumbLabel.setColour(juce::Label::textColourId, juce::Colour(0xff9cb380));
-    
+    rightThumbLabel.setFont(juce::Font(18.0f));
 
-    
+
+
     // === ENVELOPE CONFIGURATION (A, S, D, R) ===
     juce::Colour envColor(0xffa363c9);
 
@@ -118,9 +146,9 @@ MainComponent::MainComponent()
     addAndMakeVisible(attackKnob);
     attackKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     attackKnob.setRange(0.0, 1.0);
-    attackKnob.setValue(0.0);
-    attackKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    attackKnob.setNumDecimalPlacesToDisplay(3);
+    attackKnob.setValue(0.05);
+    attackKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
+    attackKnob.setNumDecimalPlacesToDisplay(2);
     attackKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     attackKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     attackKnob.setColour(juce::Slider::thumbColourId, envColor);
@@ -128,17 +156,18 @@ MainComponent::MainComponent()
     attackKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(attackLabel);
-    attackLabel.setText("A", juce::dontSendNotification);
+    attackLabel.setText("Attack", juce::dontSendNotification);
     attackLabel.setJustificationType(juce::Justification::centred);
     attackLabel.setColour(juce::Label::textColourId, envColor);
+    attackLabel.setFont(juce::Font(20.0f));
 
     // Decay
     addAndMakeVisible(decayKnob);
     decayKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     decayKnob.setRange(0.0, 1.0);
-    decayKnob.setValue(0.0);
-    decayKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    decayKnob.setNumDecimalPlacesToDisplay(3);
+    decayKnob.setValue(0.4);
+    decayKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
+    decayKnob.setNumDecimalPlacesToDisplay(2);
     decayKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     decayKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     decayKnob.setColour(juce::Slider::thumbColourId, envColor);
@@ -146,17 +175,18 @@ MainComponent::MainComponent()
     decayKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(decayLabel);
-    decayLabel.setText("D", juce::dontSendNotification);
+    decayLabel.setText("Decay", juce::dontSendNotification);
     decayLabel.setJustificationType(juce::Justification::centred);
     decayLabel.setColour(juce::Label::textColourId, envColor);
+    decayLabel.setFont(juce::Font(20.0f));
 
     // Sustain
     addAndMakeVisible(sustainKnob);
     sustainKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     sustainKnob.setRange(0.0, 1.0);
-    sustainKnob.setValue(0.0);
-    sustainKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    sustainKnob.setNumDecimalPlacesToDisplay(3);
+    sustainKnob.setValue(0.6);
+    sustainKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
+    sustainKnob.setNumDecimalPlacesToDisplay(2);
     sustainKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     sustainKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     sustainKnob.setColour(juce::Slider::thumbColourId, envColor);
@@ -164,17 +194,18 @@ MainComponent::MainComponent()
     sustainKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(sustainLabel);
-    sustainLabel.setText("S", juce::dontSendNotification);
+    sustainLabel.setText("Sustain", juce::dontSendNotification);
     sustainLabel.setJustificationType(juce::Justification::centred);
     sustainLabel.setColour(juce::Label::textColourId, envColor);
+    sustainLabel.setFont(juce::Font(20.0f));
 
     // Release
     addAndMakeVisible(releaseKnob);
     releaseKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     releaseKnob.setRange(0.0, 1.0);
-    releaseKnob.setValue(0.0);
-    releaseKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 20);
-    releaseKnob.setNumDecimalPlacesToDisplay(3);
+    releaseKnob.setValue(0.8);
+    releaseKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 120, 32);
+    releaseKnob.setNumDecimalPlacesToDisplay(2);
     releaseKnob.setColour(juce::Slider::rotarySliderOutlineColourId, envColor.withAlpha(0.12f));
     releaseKnob.setColour(juce::Slider::rotarySliderFillColourId, envColor.withAlpha(0.6f));
     releaseKnob.setColour(juce::Slider::thumbColourId, envColor);
@@ -182,9 +213,10 @@ MainComponent::MainComponent()
     releaseKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
 
     addAndMakeVisible(releaseLabel);
-    releaseLabel.setText("R", juce::dontSendNotification);
+    releaseLabel.setText("Release", juce::dontSendNotification);
     releaseLabel.setJustificationType(juce::Justification::centred);
     releaseLabel.setColour(juce::Label::textColourId, envColor);
+    releaseLabel.setFont(juce::Font(20.0f));
 
     // Toggle Switches
     juce::Colour offGrey(0xff2a2d34);
@@ -226,20 +258,34 @@ MainComponent::MainComponent()
     rightThumbToggle.setColour(juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
     rightThumbToggle.setToggleState(false, juce::dontSendNotification);
 
+
     // Biomechanical Controls
     auto sendAll = [this]()
         {
-            sender.send("/hand/left/open", static_cast<float>(leftHandKnob.getValue()));
-            sender.send("/hand/right/open", static_cast<float>(rightHandKnob.getValue()));
-            sender.send("/hand/left/thumb", static_cast<float>(leftThumbSlider.getValue()));
-            sender.send("/hand/right/thumb", static_cast<float>(rightThumbSlider.getValue()));
+            float leftOpen = static_cast<float>(leftHandKnob.getValue());
+            float rightOpen = static_cast<float>(rightHandKnob.getValue());
+            float leftThumb = static_cast<float>(leftThumbSlider.getValue());
+            float rightThumb = static_cast<float>(rightThumbSlider.getValue());
+
+            sender.send("/hand/left/open", leftOpen);
+            sender.send("/hand/right/open", rightOpen);
+            sender.send("/hand/left/thumb", leftThumb);
+            sender.send("/hand/right/thumb", rightThumb);
+
+            processingSender.send("/hand/left/open", leftOpen);
+            processingSender.send("/hand/right/open", rightOpen);
+            processingSender.send("/hand/left/thumb", leftThumb);
+            processingSender.send("/hand/right/thumb", rightThumb);
         };
 
     // Toggle
     leftHandToggle.onClick = [this, sendAll]()
         {
             if (!leftHandToggle.getToggleState())
+            {
                 sender.send("/hand/left/open", 0.0f);
+                processingSender.send("/hand/left/open", 0.0f);
+            }
 
             sendAll();
         };
@@ -247,7 +293,10 @@ MainComponent::MainComponent()
     rightHandToggle.onClick = [this, sendAll]()
         {
             if (!rightHandToggle.getToggleState())
+            {
                 sender.send("/hand/right/open", 0.0f);
+                processingSender.send("/hand/right/open", 0.0f);
+            }
 
             sendAll();
         };
@@ -255,7 +304,10 @@ MainComponent::MainComponent()
     leftThumbToggle.onClick = [this, sendAll]()
         {
             if (!leftThumbToggle.getToggleState())
+            {
                 sender.send("/hand/left/thumb", 0.0f);
+                processingSender.send("/hand/left/thumb", 0.0f);
+            }
 
             sendAll();
         };
@@ -263,7 +315,10 @@ MainComponent::MainComponent()
     rightThumbToggle.onClick = [this, sendAll]()
         {
             if (!rightThumbToggle.getToggleState())
+            {
                 sender.send("/hand/right/thumb", 0.0f);
+                processingSender.send("/hand/right/thumb", 0.0f);
+            }
 
             sendAll();
         };
@@ -276,24 +331,32 @@ MainComponent::MainComponent()
 
     // ADSR Envelope Controls
     attackKnob.onValueChange = [this]() {
-        sender.send("/attack", static_cast<float>(attackKnob.getValue()));
+        float val = static_cast<float>(attackKnob.getValue());
+        sender.send("/attack", val);
+        processingSender.send("/attack", val);
         };
 
     decayKnob.onValueChange = [this]() {
-        sender.send("/decay", static_cast<float>(decayKnob.getValue()));
+        float val = static_cast<float>(decayKnob.getValue());
+        sender.send("/decay", val);
+        processingSender.send("/decay", val);
         };
 
     sustainKnob.onValueChange = [this]() {
-        sender.send("/sustaain", static_cast<float>(sustainKnob.getValue()));
+        float val = static_cast<float>(sustainKnob.getValue());
+        sender.send("/sustaain", val);
+        processingSender.send("/sustaain", val);
         };
 
     releaseKnob.onValueChange = [this]() {
-        sender.send("/releasee", static_cast<float>(releaseKnob.getValue()));
+        float val = static_cast<float>(releaseKnob.getValue());
+        sender.send("/releasee", val);
+        processingSender.send("/releasee", val);
         };
 
 
     // Setting the size of the component after adding any child components is necessary
-    setSize(800, 600);
+    setSize(1000, 700);
 
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired(juce::RuntimePermissions::recordAudio)
@@ -309,7 +372,9 @@ MainComponent::MainComponent()
 
         receiver.connect(9000); //Listen to Python
         receiver.addListener(this); //This class handles the data
+
         sender.connect("127.0.0.1", 57130); //Forwording to SC
+        processingSender.connect("127.0.0.1", 9001); //Forwarding to Processing
     }
 }
 
@@ -386,8 +451,9 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
 
         if (shouldProcess)
         {
-            // Forwarding to SuperCollider
+            // Forwarding to SuperCollider and Processing
             sender.send(pattern, val);
+            processingSender.send(pattern, val);
 
             // Update UI safely on the main Thread
             juce::MessageManager::callAsync([this, val, pattern]() {
@@ -407,15 +473,13 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
 //==============================================================================
 void MainComponent::paint(juce::Graphics& g)
 {
-    juce::Colour topColor(0xff1a1d24);
-    juce::Colour bottomColor(0xff111317);
+    g.fillAll(juce::Colours::black);
 
-    juce::ColourGradient gradient(topColor, 0.0f, 0.0f,
-        bottomColor, 0.0f, static_cast<float>(getHeight()),
-        false);
-    g.setGradientFill(gradient);
-    g.fillAll();
+    g.setColour(juce::Colour(0x22ffffff));
+    g.drawRect(getLocalBounds(), 1);
+
 }
+
 
 void MainComponent::resized()
 {
@@ -441,7 +505,7 @@ void MainComponent::resized()
     auto sZone = topRowArea.removeFromLeft(colWidth);
     auto rZone = topRowArea;
 
-    int envKnobSize = 100;
+    int envKnobSize = 130;
 
     attackKnob.setBounds(aZone.withSizeKeepingCentre(envKnobSize, envKnobSize).translated(0, -10));
     attackLabel.setBounds(aZone.getX() + 10, attackKnob.getBottom(), aZone.getWidth() - 20, 30);
@@ -460,7 +524,7 @@ void MainComponent::resized()
     auto leftKnobZone = middleRowArea.removeFromLeft(middleRowArea.getWidth() * 0.5f);
     auto rightKnobZone = middleRowArea;
 
-    int mainKnobSize = 150;
+    int mainKnobSize = 200;
 
     leftHandKnob.setBounds(leftKnobZone.withSizeKeepingCentre(mainKnobSize, mainKnobSize).translated(0, -10));
     leftKnobLabel.setBounds(leftKnobZone.getX() + 10, leftHandKnob.getBottom() + 2, leftKnobZone.getWidth() - 20, 45);
@@ -473,10 +537,10 @@ void MainComponent::resized()
     auto leftSliderZone = bottomRowArea.removeFromLeft(bottomRowArea.getWidth() * 0.5f);
     auto rightSliderZone = bottomRowArea;
 
-    leftThumbSlider.setBounds(leftSliderZone.withSizeKeepingCentre(280, 50).translated(0, -10));
+    leftThumbSlider.setBounds(leftSliderZone.withSizeKeepingCentre(320, 60).translated(0, -10));
     leftThumbLabel.setBounds(leftSliderZone.getX() + 10, leftThumbSlider.getBottom() + 2, leftSliderZone.getWidth() - 20, 45);
 
-    rightThumbSlider.setBounds(rightSliderZone.withSizeKeepingCentre(280, 50).translated(0, -10));
+    rightThumbSlider.setBounds(rightSliderZone.withSizeKeepingCentre(320, 60).translated(0, -10));
     rightThumbLabel.setBounds(rightSliderZone.getX() + 10, rightThumbSlider.getBottom() + 2, rightSliderZone.getWidth() - 20, 45);
 
 
@@ -495,4 +559,5 @@ void MainComponent::resized()
 
     // Bottom-Right (Right Thumb)
     rightThumbToggle.setBounds(centerX + gap, dividingLineY + gap, btnSize, btnSize);
+
 }

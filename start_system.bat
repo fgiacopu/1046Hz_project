@@ -12,4 +12,9 @@ start "Python" ^
 timeout /t 2 > nul
 
 start "GUI" ^
-"%ROOT%juce\GUI\Builds\VisualStudio2026\x64\Debug\App\GUI.exe"
+"%ROOT%juce\GUI\Builds\VisualStudio2026\x64\Release\App\GUI.exe"
+
+timeout /t 2 > nul
+
+cd /d "%ROOT%processing\windows-amd64"
+start "" "processing.exe"
