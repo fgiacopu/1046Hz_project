@@ -21,7 +21,7 @@ MainComponent::MainComponent()
             return juce::String((int)freq) + " Hz";
         };
 
-	// Fake change to trigger the textFromValueFunction and update the display to show "200 Hz" at startup
+    // Fake change to trigger the textFromValueFunction and update the display to show "200 Hz" at startup
     leftHandKnob.setValue(0.0, juce::sendNotificationSync);
     leftHandKnob.setValue(0.000001, juce::dontSendNotification);
     leftHandKnob.setValue(0.0, juce::sendNotificationSync);
@@ -55,7 +55,7 @@ MainComponent::MainComponent()
             return juce::String(percentage) + " %";
         };
 
-	// Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    // Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
     leftThumbSlider.setValue(0.0, juce::sendNotificationSync);
     leftThumbSlider.setValue(0.000001, juce::dontSendNotification);
     leftThumbSlider.setValue(0.0, juce::sendNotificationSync);
@@ -88,7 +88,7 @@ MainComponent::MainComponent()
             return juce::String(percentage) + " %";
         };
 
-	// Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    // Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
     rightHandKnob.setValue(0.0, juce::sendNotificationSync);
     rightHandKnob.setValue(0.000001, juce::dontSendNotification);
     rightHandKnob.setValue(0.0, juce::sendNotificationSync);
@@ -120,7 +120,7 @@ MainComponent::MainComponent()
             return juce::String(percentage) + " %";
         };
 
-	// Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
+    // Fake change to trigger the textFromValueFunction and update the display to show "0 %" at startup
     rightThumbSlider.setValue(0.0, juce::sendNotificationSync);
     rightThumbSlider.setValue(0.000001, juce::dontSendNotification);
     rightThumbSlider.setValue(0.0, juce::sendNotificationSync);
@@ -138,7 +138,7 @@ MainComponent::MainComponent()
     rightThumbLabel.setFont(juce::Font(18.0f));
 
 
-    
+
     // === ENVELOPE CONFIGURATION (A, S, D, R) ===
     juce::Colour envColor(0xffa363c9);
 
@@ -372,7 +372,7 @@ MainComponent::MainComponent()
 
         receiver.connect(9000); //Listen to Python
         receiver.addListener(this); //This class handles the data
-        
+
         sender.connect("127.0.0.1", 57130); //Forwording to SC
         processingSender.connect("127.0.0.1", 9001); //Forwarding to Processing
     }
@@ -427,8 +427,6 @@ void MainComponent::oscMessageReceived(const juce::OSCMessage& message)
         if (pattern == "/attack" || pattern == "/decay" || pattern == "/sustaain" || pattern == "/releasee")
         {
             juce::MessageManager::callAsync([this, val, pattern]() {
-                processingSender.send(pattern, val);
-
                 if (pattern == "/attack")
                     attackKnob.setValue(val, juce::dontSendNotification);
                 else if (pattern == "/decay")
@@ -499,7 +497,7 @@ void MainComponent::resized()
     // Save the Y-coordinate of the line that separates the knobs and sliders
     int dividingLineY = middleRowArea.getBottom();
     int centerX = getLocalBounds().getCentreX();
-    
+
     // Dividing top row (A, D, S, R)
     auto colWidth = topRowArea.getWidth() / 4;
     auto aZone = topRowArea.removeFromLeft(colWidth);

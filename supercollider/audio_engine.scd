@@ -133,6 +133,7 @@ s.waitForBoot({
     });
 
     MIDIdef.noteOff(\noteOffPad, { |vel, num|
+		  ~processing.sendMsg("/noteOFF", num);
         ~notes[num].set(\gate, 0);
         ~notes[num] = nil;
     });
