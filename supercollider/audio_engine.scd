@@ -11,29 +11,21 @@ s.waitForBoot({
 
     "SuperCollider server booted".postln;
 
-
-    // GLOBAL STATE
-
     ~notes = Array.newClear(128);
     ~releasedNotes = Array.newClear(128);
     ~sustainActive = false;
-
-    ~lastGestureTime = AppClock.seconds;
 
     ~gestureData = (
         openness: 0.0,
         thumb: 0.0,
         rightOpen: 0.0,
-        rightThumb: 0.0,
+        rThumb: 0.0,
 
         attack: 0.05,
         decay: 0.4,
         sustaain: 0.6,
         releasee: 0.8
     );
-
-
-    // SYNTHDEF
 
     SynthDef(\fatPad, {
         |freq = 440, amp = 0.3, gate = 1,
@@ -42,19 +34,17 @@ s.waitForBoot({
          attack = 0.05, decay = 0.4, sustaain = 0.6, releasee = 0.8,
 
          flangerMix = 0.0, flangerDepth = 0.5, flangerRate = 0.2,
-
          chorusMix = 0.0, chorusDepth = 0.5, chorusRate = 0.15,
 
-         delayTime = 0.2, delayMix = 0.0|
+         distMix = 0.0, distAmount = 1.0|
 
         var osc1, osc2, signal, env;
         var cutoffCtrl;
 
         var lfoF, delayTimeF, flanged;
-        var lfo1, lfo2, lfo3;
-        var d1, d2, d3, chorusSignal;
+        var lfo1, lfo2, lfo3, d1, d2, d3, chorusSignal;
 
-        var delayed;
+        var drive, distorted;
 
         env = EnvGen.kr(
             Env.adsr(attack, decay, sustaain, releasee),
@@ -64,28 +54,18 @@ s.waitForBoot({
 
         osc1 = LFSaw.ar(freq);
         osc2 = LFSaw.ar(freq * 1.005);
-
         signal = Mix([osc1, osc2]) * 0.5;
 
-        signal = signal + DelayC.ar(
-            signal,
-            0.02,
-            SinOsc.kr(0.1).range(0.01, 0.02)
-        );
+        signal = signal + DelayC.ar(signal, 0.02, SinOsc.kr(0.1).range(0.01, 0.02));
 
         cutoffCtrl = Lag.kr(cutoff.clip(20, 20000), 0.05);
         signal = RLPF.ar(signal, cutoffCtrl, rq);
 
-        // ---------- FLANGER ----------
+        // FLANGER
         lfoF = SinOsc.kr(flangerRate).range(0, flangerDepth);
         delayTimeF = lfoF.linlin(0, 1, 0.001, 0.008);
         flanged = DelayC.ar(signal, 0.01, delayTimeF);
-
-        signal = XFade2.ar(
-            signal,
-            flanged,
-            flangerMix.linlin(0, 1, -1, 1)
-        );
+        signal = XFade2.ar(signal, flanged, flangerMix.linlin(0, 1, -1, 1));
 
         // CHORUS
         lfo1 = SinOsc.kr(chorusRate).range(0, chorusDepth);
@@ -102,19 +82,31 @@ s.waitForBoot({
             DelayC.ar(signal, 0.05, d3)
         ]) / 3;
 
+        signal = XFade2.ar(signal, chorusSignal, chorusMix.linlin(0, 1, -1, 1));
+
+        // DISTORSIONE AGGRESSIVA
+        drive = distAmount;
+
+        // 1. pre-gain molto forte
+        distorted = signal * (drive * 2);
+
+        // 2. saturazione base
+        distorted = tanh(distorted);
+
+        // 3. STAGE HARD (più cattivo)
+        distorted = (distorted * 3).clip2(0.7);
+
+        // 4. folding leggero (più armoniche)
+        distorted = (distorted * 1.5).fold2(0.8);
+
+        // 5. filtro per controllare asprezza
+        distorted = LPF.ar(distorted, cutoffCtrl * 1.3);
+
+        // mix più deciso
         signal = XFade2.ar(
             signal,
-            chorusSignal,
-            chorusMix.linlin(0, 1, -1, 1)
-        );
-
-        // DELAY (pollice dx)
-        delayed = DelayC.ar(signal, 1.0, delayTime);
-
-        signal = XFade2.ar(
-            signal,
-            delayed,
-            delayMix.linlin(0, 1, -1, 1)
+            distorted,
+            distMix.linlin(0, 1, -1, 1)
         );
 
         Out.ar(0, Pan2.ar(signal * env * amp, 0));
@@ -123,27 +115,11 @@ s.waitForBoot({
 
     s.sync;
 
-
     // MIDI
+	 ~processing = NetAddr("127.0.0.1", 9001);
 
-    MIDIdef.cc(\sustainPedal, { |val, num|
-        if (num == 64) {
-            if (val >= 64) {
-                ~sustainActive = true;
-            } {
-                ~sustainActive = false;
-                ~releasedNotes.do { |synth, i|
-                    if (synth.notNil) {
-                        synth.set(\gate, 0);
-                        ~releasedNotes[i] = nil;
-                    }
-                };
-            };
-        };
-    });
-
-    MIDIdef.noteOn(\noteOnPad, { |vel, num|
-
+	 MIDIdef.noteOn(\noteOnPad, { |vel, num|
+		  ~processing.sendMsg("/noteON", num, vel);
         if (~notes[num].notNil) { ~notes[num].set(\gate, 0) };
         if (~releasedNotes[num].notNil) {
             ~releasedNotes[num].set(\gate, 0);
@@ -163,70 +139,45 @@ s.waitForBoot({
     });
 
     MIDIdef.noteOff(\noteOffPad, { |vel, num|
-        if (~sustainActive) {
-            ~releasedNotes[num] = ~notes[num];
-            ~notes[num] = nil;
-        } {
-            ~notes[num].set(\gate, 0);
-            ~notes[num] = nil;
-        };
+        ~notes[num].set(\gate, 0);
+        ~notes[num] = nil;
     });
 
-
-    // OSC INPUT
-
-    OSCdef(\attack, { |msg|
-        ~gestureData[\attack] = msg[1].asFloat;
-    }, "/attack", recvPort: 57130);
-
-    OSCdef(\decay, { |msg|
-        ~gestureData[\decay] = msg[1].asFloat;
-    }, "/decay", recvPort: 57130);
-
-    OSCdef(\sustaain, { |msg|
-        ~gestureData[\sustaain] = msg[1].asFloat;
-    }, "/sustaain", recvPort: 57130);
-
-    OSCdef(\releasee, { |msg|
-        ~gestureData[\releasee] = msg[1].asFloat;
-    }, "/releasee", recvPort: 57130);
+    // OSC
+	 OSCdef(\attack, { |msg| ~gestureData[\attack] = msg[1].asFloat; }, "/attack", recvPort: 57130);
+    OSCdef(\decay, { |msg| ~gestureData[\decay] = msg[1].asFloat; }, "/decay", recvPort: 57130);
+    OSCdef(\sustaain, { |msg| ~gestureData[\sustaain] = msg[1].asFloat; }, "/sustaain", recvPort: 57130);
+    OSCdef(\releasee, { |msg| ~gestureData[\releasee] = msg[1].asFloat; }, "/releasee", recvPort: 57130);
 
     OSCdef(\leftHandOpen, { |msg|
-        ~gestureData[\openness] = msg[1].asFloat;
-        ~lastGestureTime = AppClock.seconds;
+        ~gestureData[\openness] = msg[1].clip(0, 1);
     }, '/hand/left/open', recvPort: 57130);
 
     OSCdef(\leftThumb, { |msg|
-        ~gestureData[\thumb] = msg[1].asFloat;
-        ~lastGestureTime = AppClock.seconds;
+        ~gestureData[\thumb] = msg[1].clip(0, 1);
     }, '/hand/left/thumb', recvPort: 57130);
 
     OSCdef(\rightHandOpen, { |msg|
-        ~gestureData[\rightOpen] = msg[1].asFloat;
-        ~lastGestureTime = AppClock.seconds;
+        ~gestureData[\rightOpen] = msg[1].clip(0, 1);
     }, '/hand/right/open', recvPort: 57130);
 
     OSCdef(\rightThumb, { |msg|
-        ~gestureData[\rightThumb] = msg[1].asFloat;
-        ~lastGestureTime = AppClock.seconds;
+        ~gestureData[\rThumb] = msg[1].clip(0, 1);
     }, '/hand/right/thumb', recvPort: 57130);
 
-
-
-    // CONTROL ROUTINE
-
+    // CONTROL
     ~controlRoutine = Routine({
         loop {
-
             var cutoff, thumb, right, rThumb;
             var fMix, fDepth, fRate;
             var cMix, cDepth, cRate;
-            var dMix, dTime;
+            var dMix, dAmt;
 
             cutoff = ~gestureData[\openness].linexp(0, 1, 200, 8000);
+
             thumb  = ~gestureData[\thumb];
             right  = ~gestureData[\rightOpen];
-			   rThumb = ~gestureData[\rightThumb];
+            rThumb = ~gestureData[\rThumb];
 
             fMix   = thumb;
             fDepth = thumb;
@@ -236,10 +187,11 @@ s.waitForBoot({
             cDepth = right;
             cRate  = right.linexp(0, 1, 0.08, 0.3);
 
-            dMix  = rThumb;
-            dTime = rThumb.linexp(0, 1, 0.02, 0.6);
+            // DIST PESANTE
+            dMix = rThumb.pow(0.8);
+            dAmt = rThumb.linexp(0, 1, 1, 12);
 
-            (~notes ++ ~releasedNotes).do { |synth|
+            (~notes).do { |synth|
                 if (synth.notNil) {
                     synth.set(
                         \cutoff, cutoff,
@@ -252,10 +204,10 @@ s.waitForBoot({
                         \chorusDepth, cDepth,
                         \chorusRate, cRate,
 
-                        \delayMix, dMix,
-                        \delayTime, dTime,
+                        \distMix, dMix,
+                        \distAmount, dAmt,
 
-                        \attack, ~gestureData[\attack],
+						      \attack, ~gestureData[\attack],
                         \decay, ~gestureData[\decay],
                         \sustaain, ~gestureData[\sustaain],
                         \releasee, ~gestureData[\releasee]
