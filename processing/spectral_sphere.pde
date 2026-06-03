@@ -61,7 +61,7 @@ void setup() {
 
 void oscEvent(OscMessage msg) {
 
-  println(msg);  // debug globale
+  // println(msg);  // debug
 
   if (msg.checkAddrPattern("/hand/left/open")) {
     float val = msg.get(0).floatValue();
@@ -126,9 +126,10 @@ void draw() {
   float distortion = distBase;
   distortion = constrain(distortion, 0, 1);
   
-  // curva non lineare (fondamentale)
+  // non-linear distortion
   distortion = pow(distortion, 1.8) * visualEnergy;
   
+  // smooth values to avoid jumps
   smoothDist = lerp(smoothDist, distortion, 0.05);
   smoothVelocity = lerp(smoothVelocity, noteVelocity, 0.05);
 
@@ -163,7 +164,7 @@ void draw() {
   float maxRadius = min(width, height) * 0.40;
 
 
-  // numero particelle
+  // particle count based on note and input
   int maxParticles = int(map(currentNote, 21, 108, 300, 1500));
   int particles = int(maxParticles * visualEnergy * (0.3 + 0.7 * lpf));
 
@@ -185,12 +186,10 @@ void draw() {
       float lat = latitudes[i];
       float lon = longitudes[i];
   
-      // base sfera
       float x = sin(lat) * cos(lon);
       float y = cos(lat);
       float z = sin(lat) * sin(lon);
   
-      // piccolo movimento organico
       float noiseVal = noise(
         x * 2 + t,
         y * 2,
@@ -212,16 +211,12 @@ void draw() {
 }
 
   for (int i = 0; i < particles; i++) {
-
-    // distribuzione sferica uniforme
     float lat = latitudes[i];
     float lon = longitudes[i];
-    // coordinate base sfera
+    
     float x = sin(lat) * cos(lon);
     float y = cos(lat);
     float z = sin(lat) * sin(lon);
-
-    // -------- ROTAZIONE LOCALE (orbita) --------
 
     float orbitSpeed = 0.1 + flanger * 4.0;
     float orbitRadius = 5 + chorus * 20;
@@ -232,41 +227,33 @@ void draw() {
     float orbitX = cos(angle) * orbitRadius;
     float orbitY = sin(angle) * orbitRadius;
 
-    // -------- DISTORSIONE --------
-
     float noiseVal = noise(
       x * 2 + frameCount * 0.01,
       y * 2,
       z * 2
     );
 
-    // DISTORSIONE (caotica)
     float distortionOffset = map(noiseVal, 0, 1, -180, 180) * distortion;
     distortionOffset *= (1.0 - lpf);
     
-    // FLANGER (onda)
+    // flanger
     float wave = sin(frameCount * 0.05 + i * 0.2);
     float flangerOffset = wave * 30 * flanger;
     
-    // CHORUS (scala)
+    // chorus
     float scale = 1.0 + chorus * 0.1;
     
-    // RAGGIO FINALE
     float rRaw = (baseRadius + distortionOffset + flangerOffset) * scale;
-
-    // compressione morbida invece di clamp duro
     float r = rRaw;
     if (r > maxRadius) {
       float excess = r - maxRadius;
-      r = maxRadius + excess * 0.3;  // comprime oltre il limite
+      r = maxRadius + excess * 0.3;
     }
 
-    // posizione finale
     float px = x * r + orbitX;
     float py = y * r + orbitY;
     float pz = z * r;
     
-    // posizione base PULITA (senza jitter)
     float cleanX = px;
     float cleanY = py;
     float cleanZ = pz;
@@ -275,11 +262,12 @@ void draw() {
     float flangCol = leftThumb;
     float chorCol = chorus;
     
-    float rCol = 120 + 160 * distCol;   // distorsione - rosso
-    float gCol = 100 + 140 * chorCol;   // chorus - green
-    float bCol = 120 + 160 * flangCol;  // flanger - blue
+    // colors from audio params
+    float rCol = 120 + 160 * distCol;
+    float gCol = 100 + 140 * chorCol;
+    float bCol = 120 + 160 * flangCol;
     
-    // bilanciamento con energia
+    // scale with energy
     rCol *= colorEnergy;
     gCol *= colorEnergy;
     bCol *= colorEnergy;
@@ -292,7 +280,7 @@ void draw() {
     float jitterY = random(-jitter, jitter);
     float jitterZ = random(-jitter, jitter);
     
-    int layers = 1 + (chorus > 0.3 ? 1 : 0);  // max 2 voci
+    int layers = 1 + (chorus > 0.3 ? 1 : 0);
     float spread = chorus * 8;
     
     for (int c = 0; c < layers; c++) {
